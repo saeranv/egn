@@ -10,7 +10,7 @@ app = Flask(__name__, static_folder="./templates/static")
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app, async_mode="eventlet")
 STATE = session
-STATE['debug'] = []
+
 
 @socketio.on("connect")
 def test_connect():
@@ -43,7 +43,7 @@ def base64_to_image(base64_str:str)->npt.NDArray:
     image_bytes = base64.b64decode(base64_data)
     image_arr = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_arr, cv2.IMREAD_COLOR)
-    STATE['debug'] = [image_arr.shape, image_arr.dtype, image.shape, image.dtype]
+    STATE['debug'] += [image_arr.shape, image_arr.dtype, image.shape, image.dtype]
     return image
 
 
@@ -77,6 +77,8 @@ def index():
 
     Returns index.html
     """
+    if 'debug' not in STATE:
+        STATE['debug'] = ["first"]
     debug = STATE['debug']
     state = 'state-check'
     return render_template("index.html", debug=debug, state=state)

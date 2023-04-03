@@ -9,7 +9,6 @@
     		transform: rotateY(180deg);
     		-webkit-transform:rotateY(180deg); /* Safari and Chrome */
     		-moz-transform:rotateY(180deg); /* Firefox */
-    		
     	}
     </style>
     <script
@@ -19,8 +18,20 @@
   </head>
 
   <body>
+      {%- for txt in debug -%}
+      <p>{{ txt }}</p>
+      {%- endfor -%}
     <p>state: {{ state }} </p>
-    <p>Hello</p>
+    <!--<div id="container">
+      <video autoplay playsinline id="videoElement"></video>
+      <canvas id="canvas" width="400" height="300"></canvas>
+    </div>
+    -->
+    <div class="img_1">
+      <img id="photo" width="400" height="300">
+      <!-- <h1>video</h1> -->
+    </div>
+    <script  src="{{ url_for('static',filename='script.js') }}"></script>
   </body>
 
 </html>
