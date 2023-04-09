@@ -71,14 +71,12 @@ def receive_image(image:str):
     emit("processed_image", processed_img_data)
 
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     """Renders the index.html template."""
 
     if request.method == 'POST':
-        data = request.get_json()
-        # url = data['message']
-        url = 'static/keyboard.jpg'
+        url = request.get_json()['message']
         socketio.emit('stream_image', url)
 
     if 'debug' not in STATE:
