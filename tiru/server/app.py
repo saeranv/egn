@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 import numpy.typing as npt
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__, static_folder="./templates/static")
@@ -30,8 +30,8 @@ def base64_to_image(base64_str:str)->npt.NDArray:
 
     The base64_to_image function accepts a base64 encoded string and returns
     an image. The function extracts the base64 binary data from the input
-    string, decodes it, converts the bytes to numpy array, and then decodes the
-    numpy array as an image using OpenCV.
+    string, decodes it, converts the bytes to numpy array, and then decodes
+    the numpy array as an image using OpenCV.
 
     Args:
         base64_str: base64 encoded image string to the
@@ -70,17 +70,28 @@ def receive_image(image:str):
     processed_img_data = b64_src + processed_img_data
     emit("processed_image", processed_img_data)
 
+@app.route("/stream")
+def stream(methods=['GET', 'POST']):
+    if request.method == 'POST':
+        data = request.get_json()
+        url = data['message']
+        emit('process_img', url)
 
-@app.route("/")
+
+@socketio.on('process_image')
+def handle_img(url):
+    emit('stream_image', url)
+
+
+@app.route('/')
 def index():
-    """Renders the index.html template.
+    """Renders the index.html template."""
 
-    Returns index.html
-    """
     if 'debug' not in STATE:
         STATE['debug'] = ["first"]
     debug = STATE['debug']
-    state = 'state-check'
+    state = 'state-check-2'
+
     return render_template("index.html", debug=debug, state=state)
 
 
