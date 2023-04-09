@@ -5,8 +5,18 @@ var socket = io.connect(
 
 // Returns 'connect' data from test_connect function
 socket.on('connect', function () {
-    console.log("Connected...!", socket.connected)
+    console.log("Connected...!", socket.connected, 'at', io_param)
 });
+
+
+socket.on('stream_image', function (image_uri) {
+    // For <img id="photo" width="400" height="300">
+    //photo.setAttribute('src', 'static/keyboard.jpg');
+    console.log("Received!") 
+    console.log(image_uri)
+    photo.setAttribute('src', image_uri);
+});
+
 
 // window.onload = function () {
 //     var canvas = document.getElementById('canvas');
@@ -43,9 +53,3 @@ socket.on('connect', function () {
 //    socket.emit('process_image');
 //}, 1000 / FPS);
 
-socket.on('stream_image', function (image_uri) {
-    // For <img id="photo" width="400" height="300">
-    //photo.setAttribute('src', 'static/keyboard.jpg');
-    console.log("Received!") 
-    photo.setAttribute('src', image_uri);
-});    

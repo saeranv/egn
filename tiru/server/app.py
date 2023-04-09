@@ -70,22 +70,16 @@ def receive_image(image:str):
     processed_img_data = b64_src + processed_img_data
     emit("processed_image", processed_img_data)
 
-@app.route("/stream")
-def stream(methods=['GET', 'POST']):
-    if request.method == 'POST':
-        data = request.get_json()
-        url = data['message']
-        emit('process_img', url)
 
-
-@socketio.on('process_image')
-def handle_img(url):
-    emit('stream_image', url)
-
-
-@app.route('/')
+@app.route('/', methods=['POST'])
 def index():
     """Renders the index.html template."""
+
+    if request.method == 'POST':
+        data = request.get_json()
+        # url = data['message']
+        url = 'static/keyboard.jpg'
+        socketio.emit('stream_image', url)
 
     if 'debug' not in STATE:
         STATE['debug'] = ["first"]
