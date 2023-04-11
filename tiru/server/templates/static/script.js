@@ -11,9 +11,7 @@ socket.on('connect', function () {
 
 socket.on('stream_image', function (image_uri) {
     // For <img id="photo" width="400" height="300">
-    //photo.setAttribute('src', 'static/keyboard.jpg');
     console.log("Received!") 
-    console.log(image_uri)
     photo.setAttribute('src', image_uri);
 });
 

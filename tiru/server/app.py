@@ -22,7 +22,8 @@ def test_connect():
     Returns A 'connected' string
     """
     print("Connected")
-    emit("my response", {"data": "Connected"})
+    # emit("connect_response", {"data": "Connected"})
+    emit(event="connect_response", data={"data": "Connected"}, callback=None)
 
 
 def base64_to_image(base64_str:str)->npt.NDArray:
@@ -76,8 +77,12 @@ def index():
     """Renders the index.html template."""
 
     if request.method == 'POST':
-        url = request.get_json()['message']
-        socketio.emit('stream_image', url)
+        image_uri = request.get_json()['message']
+        # Use socketio.emit(), not emit() since emit() will send back to
+        # original socketio.on event.
+        b64_src = "data:image/jpg;base64,"
+        image_uri = b64_src + image_uri
+        socketio.emit('stream_image', image_uri)
 
     if 'debug' not in STATE:
         STATE['debug'] = ["first"]
