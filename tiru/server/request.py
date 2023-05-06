@@ -17,7 +17,8 @@ def read_binary() -> bytes:
             chunk = stdin.buffer.read()
             if chunk == b'':
                 break
-            # Move "write" postion to stream end w/ seek, else overwrite
+            # Move "write" postion to stream end w/ seek
+            # or else overwrite
             byte_file.seek(0, 2)
             byte_file.write(chunk)
 
@@ -29,7 +30,7 @@ def post_binary_image(byte_file:bytes) -> None:
     img_uri = byte_file
     data = {'message': img_uri}
     response = requests.post(url, json=data)
-    print(response.text)
+    #print(response.text)
 
 
 
@@ -41,7 +42,8 @@ if __name__ == "__main__":
     parser.add_argument('-str', type=str)
 
     args = parser.parse_args()
-
+    print(args.img)
     if args.img:
         byte_file = read_binary()
         post_binary_image(byte_file)
+
