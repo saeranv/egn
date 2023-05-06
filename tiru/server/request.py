@@ -6,6 +6,16 @@ from io import BytesIO, StringIO
 from argparse import ArgumentParser
 
 
+def timed_stdin() -> str:
+    """Read stdin """
+    # Check if piped data exists
+    rlist, wlist, xlist = [sys.stdin], [], []
+    timeout = 0.5
+    rlist = select(rlist, wlist, xlist, timeout)[0]
+    # return sys.stdin.read() if rlist else []
+    return read_binary() if rlist else []
+
+
 def read_binary() -> bytes:
     """Read binary stream from stdin."""
 
@@ -33,7 +43,6 @@ def post_binary_image(byte_file:bytes) -> None:
     #print(response.text)
 
 
-
 if __name__ == "__main__":
 
     parser = ArgumentParser(
@@ -41,8 +50,13 @@ if __name__ == "__main__":
     parser.add_argument('-img', type=str)
     parser.add_argument('-str', type=str)
 
+    args, stdin_arr = parser.parse_known_args()
+
+    if not stdin_arr:
+        stdin_arr = read_timed_stdin()
     args = parser.parse_args()
     print(args.img)
+
     if args.img:
         byte_file = read_binary()
         post_binary_image(byte_file)
