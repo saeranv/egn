@@ -66,10 +66,9 @@ def receive_image(image:str):
     # Encode image to string
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
     _, frame_encoded = cv2.imencode(".jpg", frame_resized, encode_param)
-    processed_img_data = base64.b64encode(frame_encoded).decode()
-    b64_src = "data:image/jpg;base64,"
-    processed_img_data = b64_src + processed_img_data
-    emit("processed_image", processed_img_data)
+    image_uri_ = base64.b64encode(frame_encoded).decode()
+    image_uri = "data:image/jpg;base64," + image_uri_
+    emit("processed_image", image_uri)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -77,11 +76,10 @@ def index():
     """Renders the index.html template."""
 
     if request.method == 'POST':
-        image_uri = request.get_json()['message']
+        image_uri_ = request.get_json()['message']
         # Use socketio.emit(), not emit() since emit() will send back to
         # original socketio.on event.
-        b64_src = "data:image/jpg;base64,"
-        image_uri = b64_src + image_uri
+        image_uri = "data:image/jpg;base64," + image_uri_
         socketio.emit('stream_image', image_uri)
 
     if 'debug' not in STATE:
