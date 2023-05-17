@@ -16,24 +16,24 @@ def timed_stdin() -> str:
     return read_binary() if rlist else []
 
 
-def read_binary() -> bytes:
-    """Read binary stream from stdin."""
-
-    # Create in-memory binary buffer to collect binary stream.
-    byte_file = BytesIO()
-
-    with sys.stdin as stdin:
-        while True:
-            chunk = stdin.buffer.read()
-            if chunk == b'':
-                break
-            # Move "write" postion to stream end w/ seek
-            # or else overwrite
-            byte_file.seek(0, 2)
-            byte_file.write(chunk)
-
-    return byte_file
-
+# def read_binary() -> bytes:
+    # """Read binary stream from stdin."""
+#
+    # # Create in-memory binary buffer to collect binary stream.
+    # byte_file = BytesIO()
+#
+    # with sys.stdin as stdin:
+        # while True:
+            # chunk = stdin.buffer.read()
+            # if chunk == b'':
+                # break
+            # # Move "write" postion to stream end w/ seek
+            # # or else overwrite
+            # byte_file.seek(0, 2)
+            # byte_file.write(chunk)
+#
+    # return byte_file
+#
 
 def post_binary_image(byte_file:bytes) -> None:
     url = 'http://127.0.0.1:8100/'
