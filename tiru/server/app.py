@@ -40,7 +40,7 @@ def base64_to_image(base64_str:str)->npt.NDArray:
 
     Returns image as (3,M,N) array.
     """
-    base64_data = base64_str.split(",")[1]
+    base64_data = base64_str.split(",")[1]  # separate header
     image_bytes = base64.b64decode(base64_data)
     image_arr = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_arr, cv2.IMREAD_COLOR)

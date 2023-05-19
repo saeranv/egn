@@ -46,9 +46,11 @@ def read_timed_stdin(mode:str) -> str|bytes|list[bytes]|list[str]:
         print('implement t mode.')
 
 
+# TODO: we want this to be used within python for visualization from .py
+# file editing.
 def post_binary_image(byte_file:bytes, url:str) -> None:
     # If byte_file is io.BytesIO, use byte_file.read()
-    img_uri = base64.b64encode(byte_file).decode()
+    img_uri = byte_file
     data = {'message': img_uri}
     response = requests.post(url, json=data)
     # print(response.text)
@@ -64,15 +66,19 @@ if __name__ == "__main__":
     args, stdin_arr = parser.parse_known_args()
 
     # args = parser.parse_args()
-    if not stdin_arr:
-        if args.img:
-            stdin_arr = read_timed_stdin('b')
-        else:
-            stdin_arr = read_timed_stdin('t')
+    if stdin_arr:
+        # TODO: fix. Doesn't work because input is text which can't cast
+        # TODO: just make optional narg in -img arg and specify bytes?
+        assert False, "Only piped stdin works."
+        # _stdin_arr = bytearray()
+        # [_stdin_arr.append(bytes(x, 'utf-8')) for x in stdin_arr]
+        # stdin_arr = _stdin_arr
     else:
+        stdin_arr = read_timed_stdin('b')
+        stdin_arr = [base64.b64encode(stdin_arr).decode()]
 
 
     # print('img: ', args.img, 'txt: ', args.txt)
     if args.img:
-        byte_file = stdin_arr
+        byte_file = stdin_arr[0]
         post_binary_image(byte_file, url=URL)
