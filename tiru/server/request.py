@@ -45,7 +45,7 @@ def post_binary_image(byte_file:bytes, url:str) -> None:
     img_uri = byte_file
     data = {'message': img_uri}
     response = requests.post(url, json=data)
-    print(response.text)
+    # print(response.text)
 
 
 if __name__ == "__main__":
@@ -53,8 +53,8 @@ if __name__ == "__main__":
     # TODO: replace with invoke
     parser = ArgumentParser(
         prog='tiru', description='??')
-    parser.add_argument('-img', type=str)
-    parser.add_argument('-str', type=str)
+    parser.add_argument('-img', action='store_true', default=False)
+    parser.add_argument('-txt', action='store_true', default=False)
 
     args, stdin_arr = parser.parse_known_args()
     if not stdin_arr:
@@ -63,7 +63,7 @@ if __name__ == "__main__":
         else:
             stdin_arr = read_timed_stdin('t')
 
-    print(args.img)
+    print('img: ', args.img, 'txt: ', args.txt)
     if args.img and len(stdin_arr) > 0:
         byte_file = stdin_arr[0]
         post_binary_image(byte_file, url=URL)
