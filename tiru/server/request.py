@@ -26,14 +26,19 @@ URL = 'http://127.0.0.1:8100/'
 #
     # return byte_file
 
-def read_timed_stdin() -> str|list[typ.Any]:
-    """Read stdin """
+def read_timed_stdin(mode:str) -> str|bytes|list[bytes]|list[str]:
+    """Read stdin
+
+    Args:
+        mode: 'b' for binary, 't' for text
+    """
     # Check if piped data exists
-    rlist, wlist, xlist = [sys.stdin], [], []
+    # [r|w|x]list: wait until ready for [reading|writing|exception-condition]
+    read_arr = [sys.stdin] if mode == 't' else [sys.stdin.buffer]
     timeout = 0.5
-    rlist = select(rlist, wlist, xlist, timeout)[0]
-    return sys.stdin.read() if rlist else []
-    # return read_binary() if rlist else []
+    readable = select(read_arr, [], [], timeout)[0]
+    is_read = len(readable) > 0
+    return read_arr[0].readline() if is_read else []
 
 
 def post_binary_image(byte_file:bytes, url:str) -> None:
@@ -53,12 +58,13 @@ if __name__ == "__main__":
 
     args, stdin_arr = parser.parse_known_args()
     if not stdin_arr:
-        stdin_arr = read_timed_stdin()
+        if args.img:
+            stdin_arr = read_timed_stdin('b')
+        else:
+            stdin_arr = read_timed_stdin('t')
 
     print(args.img)
-
     if args.img and len(stdin_arr) > 0:
-        # byte_file = read_binary()
         byte_file = stdin_arr[0]
         post_binary_image(byte_file, url=URL)
 
