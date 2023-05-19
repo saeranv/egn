@@ -75,17 +75,20 @@ def receive_image(image:str):
 def index():
     """Renders the index.html template."""
 
+    if 'debug' not in STATE:
+        STATE['debug'] = ["first"]
+
     if request.method == 'POST':
+        val = len(STATE['debug'])
+        STATE['debug'] += [f'img-posted-{val}']
         image_uri_ = request.get_json()['message']
         # Use socketio.emit(), not emit() since emit() will send back to
         # original socketio.on event.
         image_uri = "data:image/jpg;base64," + image_uri_
         socketio.emit('stream_image', image_uri)
 
-    if 'debug' not in STATE:
-        STATE['debug'] = ["first"]
     debug = STATE['debug']
-    state = 'state-check-2'
+    state = 'state-check'
 
     return render_template("index.html", debug=debug, state=state)
 
