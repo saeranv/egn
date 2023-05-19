@@ -5,7 +5,7 @@ import requests
 from io import BytesIO, StringIO
 from argparse import ArgumentParser
 from select import select
-
+import base64
 
 URL = 'http://127.0.0.1:8100/'
 
@@ -14,7 +14,8 @@ def read_binary() -> bytes:
     """Read binary stream from stdin."""
     # # Create in-memory binary buffer to collect binary stream.
 
-    byte_file = BytesIO()
+    #byte_file = BytesIO()
+    byte_file = bytearray()
     with sys.stdin as stdin:
         while True:
             chunk = stdin.buffer.read()
@@ -22,8 +23,9 @@ def read_binary() -> bytes:
                 break
             # Move "write" postion to stream end w/ seek
             # or else overwrite
-            byte_file.seek(0, 2)
-            byte_file.write(chunk)
+            # byte_file.seek(0, 2)
+            # byte_file.write(chunk)
+            byte_file.extend(chunk)
     return byte_file
 
 
@@ -45,7 +47,8 @@ def read_timed_stdin(mode:str) -> str|bytes|list[bytes]|list[str]:
 
 
 def post_binary_image(byte_file:bytes, url:str) -> None:
-    img_uri = byte_file
+    # If byte_file is io.BytesIO, use byte_file.read()
+    img_uri = base64.b64encode(byte_file).decode()
     data = {'message': img_uri}
     response = requests.post(url, json=data)
     # print(response.text)
@@ -59,15 +62,17 @@ if __name__ == "__main__":
     parser.add_argument('-img', action='store_true', default=False)
     parser.add_argument('-txt', action='store_true', default=False)
     args, stdin_arr = parser.parse_known_args()
+
+    # args = parser.parse_args()
     if not stdin_arr:
         if args.img:
             stdin_arr = read_timed_stdin('b')
         else:
             stdin_arr = read_timed_stdin('t')
+    else:
+
 
     # print('img: ', args.img, 'txt: ', args.txt)
-    if args.img and len(stdin_arr) > 0:
+    if args.img:
         byte_file = stdin_arr
-        print('byte-file:', byte_file)
         post_binary_image(byte_file, url=URL)
-
