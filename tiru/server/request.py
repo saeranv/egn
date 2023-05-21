@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-img', '--img_file', type=FileType('rb'),
         help=('# Accepts img filepath: \n'
-              'request.py -img ./img.jpg')
+              'request.py -img ./img.jpg'
               '# To stream file as <stdin> use "-" as arg:\n'
               'cat img.jpg | request.py -img -\n'))
     args =  parser.parse_args()
