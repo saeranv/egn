@@ -3,7 +3,7 @@ import sys
 import typing as typ
 import requests
 from io import BytesIO, StringIO
-from argparse import ArgumentParser
+from argparse import ArgumentParser, FileType
 from select import select
 import base64
 
@@ -61,24 +61,30 @@ if __name__ == "__main__":
     # TODO: replace with invoke
     parser = ArgumentParser(
         prog='tiru', description='??')
-    parser.add_argument('-img', action='store_true', default=False)
-    parser.add_argument('-txt', action='store_true', default=False)
-    args, stdin_arr = parser.parse_known_args()
+    parser.add_argument(
+        '-img', type=FileType('rb'),
+        help=('# to stream file as <stdin> use "-" as arg:\n'
+              'cat img.jpg | request.py -img -\n'
+              '# to add filename: \n'
+              'request.py -img ./img.jpg')
+    )
+    # args, stdin_arr = parser.parse_known_args()
+    args =  parser.parse_args()
 
-    # args = parser.parse_args()
-    if stdin_arr:
-        # TODO: fix. Doesn't work because input is text which can't cast
-        # TODO: just make optional narg in -img arg and specify bytes?
-        assert False, "Only piped stdin works."
-        # _stdin_arr = bytearray()
-        # [_stdin_arr.append(bytes(x, 'utf-8')) for x in stdin_arr]
-        # stdin_arr = _stdin_arr
-    else:
-        stdin_arr = read_timed_stdin('b')
-        stdin_arr = [base64.b64encode(stdin_arr).decode()]
-
+    # if stdin_arr:
+        # # TODO: fix. Doesn't work because input is text which can't cast
+        # # TODO: just make optional narg in -img arg and specify bytes?
+        # assert False, "Only piped stdin works."
+        # # _stdin_arr = bytearray()
+        # # [_stdin_arr.append(bytes(x, 'utf-8')) for x in stdin_arr]
+        # # stdin_arr = _stdin_arr
+    # # else:
+        # stdin_arr = read_timed_stdin('b')
+        # stdin_arr = [base64.b64encode(stdin_arr).decode()]
 
     # print('img: ', args.img, 'txt: ', args.txt)
     if args.img:
-        byte_file = stdin_arr[0]
-        post_binary_image(byte_file, url=URL)
+        # args.img: io.BufferedReader
+        bytes_data = args.img.read()  # bytes
+        print(type(bytes_data.decode()))
+        # post_binary_image(byte_file, url=URL)
