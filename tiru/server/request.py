@@ -2,49 +2,10 @@ from __future__ import annotations
 import sys
 import typing as typ
 import requests
-from io import BytesIO, StringIO
 from argparse import ArgumentParser, FileType
-from select import select
 import base64
 
 URL = 'http://127.0.0.1:8100/'
-
-
-def read_binary() -> bytes:
-    """Read binary stream from stdin."""
-    # # Create in-memory binary buffer to collect binary stream.
-
-    #byte_file = BytesIO()
-    byte_file = bytearray()
-    with sys.stdin as stdin:
-        while True:
-            chunk = stdin.buffer.read()
-            if chunk == b'':
-                break
-            # Move "write" postion to stream end w/ seek
-            # or else overwrite
-            # byte_file.seek(0, 2)
-            # byte_file.write(chunk)
-            byte_file.extend(chunk)
-    return byte_file
-
-
-def read_timed_stdin(mode:str) -> str|bytes|list[bytes]|list[str]:
-    """Read stdin
-    Args:
-        mode: 'b' for binary, 't' for text
-    """
-    # Check if piped data exists
-    # [r|w|x]list: wait until ready for [reading|writing|exception-condition]
-    read_arr = [sys.stdin]
-    timeout = 0.5
-    readable = select(read_arr, [], [], timeout)[0]
-    is_read = len(readable) > 0
-    if mode == 'b':
-        return read_binary() if is_read else []
-    else:
-        print('implement t mode.')
-
 
 # TODO: we want this to be used within python for visualization from .py
 # file editing.
