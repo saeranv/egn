@@ -48,12 +48,10 @@ def read_timed_stdin(mode:str) -> str|bytes|list[bytes]|list[str]:
 
 # TODO: we want this to be used within python for visualization from .py
 # file editing.
-def post_binary_image(byte_file:bytes, url:str) -> None:
-    # If byte_file is io.BytesIO, use byte_file.read()
-    img_uri = byte_file
-    data = {'message': img_uri}
-    response = requests.post(url, json=data)
-    # print(response.text)
+def post_byte_image(byte_str:str, url:str) -> None:
+    """Post image as base64 encoded string to server."""
+    data = {'message': byte_str}
+    _ = requests.post(url, json=data)
 
 
 if __name__ == "__main__":
@@ -62,7 +60,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(
         prog='tiru', description='??')
     parser.add_argument(
-        '-img', type=FileType('rb'),
+        '-img', '--img_file', type=FileType('rb'),
         help=('# to stream file as <stdin> use "-" as arg:\n'
               'cat img.jpg | request.py -img -\n'
               '# to add filename: \n'
@@ -83,8 +81,9 @@ if __name__ == "__main__":
         # stdin_arr = [base64.b64encode(stdin_arr).decode()]
 
     # print('img: ', args.img, 'txt: ', args.txt)
-    if args.img:
-        # args.img: io.BufferedReader
-        bytes_data = args.img.read()  # bytes
-        print(type(bytes_data.decode()))
-        # post_binary_image(byte_file, url=URL)
+    if args.img_file:
+        # args.img is file object io.BufferedReader, convert to base64 str
+        # to send through json
+        byte_data = args.img_file.read()  # bytes
+        byte_b64_str = base64.b64encode(byte_data).decode('utf-8') # base64 str
+        post_binary_image(bytes_b64_str, url=URL)
