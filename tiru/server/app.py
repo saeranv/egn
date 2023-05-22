@@ -70,6 +70,14 @@ def receive_image(image:str):
     image_uri = "data:image/jpg;base64," + image_uri_
     emit("processed_image", image_uri)
 
+@app.route("/status", methods=['GET'])
+def status():
+    """Check if server is running."""
+    return {
+        'statusCode': 200,
+        'body': 23
+    }
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -86,6 +94,7 @@ def index():
         # original socketio.on event.
         image_uri = "data:image/jpg;base64," + image_uri_
         socketio.emit('stream_image', image_uri)
+
 
     debug = STATE['debug']
     state = 'state-check'

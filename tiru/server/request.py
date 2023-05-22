@@ -19,6 +19,7 @@ def server_status(url:str) -> int:
     r = requests.get(url)
     return r.status_code
 
+
 if __name__ == "__main__":
 
     # TODO: replace with invoke
@@ -31,18 +32,24 @@ if __name__ == "__main__":
               '# To stream file as <stdin> use "-" as arg:\n'
               'cat img.jpg | request.py -img -\n'))
     parser.add_argument(
-        '-stat', '--server_status', type=FileType('rb'),
+        '-stat', '--server_status', action='store_true',
+        default='False',
         help='Exit with status code 0 (success) if server else 1')
     args =  parser.parse_args()
 
-    if args.img_file:
+    if args.image_file:
         # args.img is file object io.BufferedReader
         # convert to base64 str to send through json
-        byte_data = args.img_file.read()  # bytes
+        byte_data = args.image_file.read()  # bytes
         byte_b64_str = base64.b64encode(byte_data).decode('utf-8') # base64 str
         image_file(byte_b64_str, url=URL)
     elif args.server_status:
         status_url = URL + 'status'
-        status_code = server_status(url=status_url)
-        print(status_code)
-        #exit(status_code)
+        try:
+            status_code = server_status(url=status_url)
+        except requests.exceptions.ConnectionError:
+           status_code = 400
+
+        exit_code = 0 if status_code == 200 else 1
+        sys.exit(exit_code)
+
