@@ -10,7 +10,8 @@ app = Flask(__name__, static_folder="./templates/static")
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app, async_mode="eventlet")
 STATE = session
-
+PORT = 8100
+HOST = '127.0.0.1'
 
 @socketio.on("connect")
 def test_connect():
@@ -100,5 +101,5 @@ def index():
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, port=8100, host='0.0.0.0')
+    socketio.run(app, debug=True, port=PORT, host=HOST)
 

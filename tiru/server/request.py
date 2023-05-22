@@ -14,7 +14,7 @@ def image_file(byte_str:str, url:str) -> None:
     data = {'message': byte_str}
     _ = requests.post(url, json=data)
 
-def server_status(url:str) -> int:
+def status(url:str) -> int:
     """Check if server is running."""
     r = requests.get(url)
     return r.status_code
@@ -32,12 +32,13 @@ if __name__ == "__main__":
               '# To stream file as <stdin> use "-" as arg:\n'
               '$ cat img.jpg | request.py -img -\n'))
     parser.add_argument(
-        '-stat', '--server_status', action='store_true',
-        default='False',
+        '--status', action='store_true', default=False,
         help=('# Exit with status code 0 (success) if server else1\n'
-              '$ request.pu -stat && echo "Success" || echo "Fail"'))
+              '$ [[ $(python request.py -stat) == "200" ]] && echo "Run."'))
+    parser.add_argument(
+        '--url', action='store_true', default=False)
     args =  parser.parse_args()
-
+    print('asf')
     if args.image_file:
         url = URL + 'image_file'
         # args.img is file object io.BufferedReader
@@ -45,10 +46,12 @@ if __name__ == "__main__":
         byte_data = args.image_file.read()  # bytes
         byte_b64_str = base64.b64encode(byte_data).decode('utf-8') # base64 str
         image_file(byte_b64_str, url=url)
-    elif args.server_status:
+    elif args.url:
+        print(URL, file=sys.stdout)
+    elif args.status:
         url = URL + 'status'
         try:
-            status_code = server_status(url=url)
+            status_code = status(url=url)
         except requests.exceptions.ConnectionError:
            status_code = 400
         print(status_code, file=sys.stdout)
