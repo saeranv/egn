@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--url', action='store_true', default=False)
     args =  parser.parse_args()
-    print('asf')
+
     if args.image_file:
         url = URL + 'image_file'
         # args.img is file object io.BufferedReader
