@@ -9,16 +9,15 @@ URL = 'http://127.0.0.1:8100/'
 
 # TODO: we want this to be used within python for visualization from .py
 # file editing.
-def img(byte_str:str, url:str) -> None:
+def image_file(byte_str:str, url:str) -> None:
     """Post image as base64 encoded string to server."""
     data = {'message': byte_str}
     _ = requests.post(url, json=data)
 
-def status(url:str) -> bool:
+def server_status(url:str) -> int:
     """Check if server is running."""
-    data = {'message': "status"}
-    _ = requests.post(url, json=data)
-
+    r = requests.get(url)
+    return r.status_code
 
 if __name__ == "__main__":
 
@@ -33,8 +32,7 @@ if __name__ == "__main__":
               'cat img.jpg | request.py -img -\n'))
     parser.add_argument(
         '-stat', '--server_status', type=FileType('rb'),
-        help='Exit with status code 0 (success) if server is
-        running else 1.)
+        help='Exit with status code 0 (success) if server else 1')
     args =  parser.parse_args()
 
     if args.img_file:
@@ -43,3 +41,8 @@ if __name__ == "__main__":
         byte_data = args.img_file.read()  # bytes
         byte_b64_str = base64.b64encode(byte_data).decode('utf-8') # base64 str
         image_file(byte_b64_str, url=URL)
+    elif args.server_status:
+        status_url = URL + 'status'
+        status_code = server_status(url=status_url)
+        print(status_code)
+        #exit(status_code)

@@ -79,8 +79,8 @@ def index():
         STATE['debug'] = ["first"]
 
     if request.method == 'POST':
-        val = len(STATE['debug'])
-        STATE['debug'] += [f'img-posted-{val}']
+        # val = len(STATE['debug'])
+        # STATE['debug'] += [f'img-posted-{val}']
         image_uri_ = request.get_json()['message']
         # Use socketio.emit(), not emit() since emit() will send back to
         # original socketio.on event.
