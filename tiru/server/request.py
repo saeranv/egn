@@ -28,13 +28,14 @@ if __name__ == "__main__":
     parser.add_argument(
         '-img', '--image_file', type=FileType('rb'),
         help=('# Accepts img filepath: \n'
-              'request.py -img ./img.jpg'
+              '$ request.py -img ./img.jpg'
               '# To stream file as <stdin> use "-" as arg:\n'
-              'cat img.jpg | request.py -img -\n'))
+              '$ cat img.jpg | request.py -img -\n'))
     parser.add_argument(
         '-stat', '--server_status', action='store_true',
         default='False',
-        help='Exit with status code 0 (success) if server else 1')
+        help=('# Exit with status code 0 (success) if server else1\n'
+              '$ request.pu -stat && echo "Success" || echo "Fail"'))
     args =  parser.parse_args()
 
     if args.image_file:
@@ -49,7 +50,4 @@ if __name__ == "__main__":
             status_code = server_status(url=status_url)
         except requests.exceptions.ConnectionError:
            status_code = 400
-
-        exit_code = 0 if status_code == 200 else 1
-        sys.exit(exit_code)
-
+        print(status_code)
