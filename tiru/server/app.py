@@ -73,11 +73,18 @@ def receive_image(image:str):
 @app.route("/status", methods=['GET'])
 def status():
     """Check if server is running."""
-    return {
-        'statusCode': 200,
-        'body': 23
-    }
+    return { 'statusCode': 200 }
 
+@app.route("/image_file", methods=['POST'])
+def image_file():
+    """Post image to tiru url."""
+    # val = len(STATE['debug'])
+    # STATE['debug'] += [f'img-posted-{val}']
+    image_uri_ = request.get_json()['message']
+    # Use socketio.emit(), not emit() since emit() will send back to
+    # original socketio.on event.
+    image_uri = "data:image/jpg;base64," + image_uri_
+    socketio.emit('stream_image', image_uri)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -85,16 +92,6 @@ def index():
 
     if 'debug' not in STATE:
         STATE['debug'] = ["first"]
-
-    if request.method == 'POST':
-        # val = len(STATE['debug'])
-        # STATE['debug'] += [f'img-posted-{val}']
-        image_uri_ = request.get_json()['message']
-        # Use socketio.emit(), not emit() since emit() will send back to
-        # original socketio.on event.
-        image_uri = "data:image/jpg;base64," + image_uri_
-        socketio.emit('stream_image', image_uri)
-
 
     debug = STATE['debug']
     state = 'state-check'

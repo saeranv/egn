@@ -39,15 +39,16 @@ if __name__ == "__main__":
     args =  parser.parse_args()
 
     if args.image_file:
+        url = URL + 'image_file'
         # args.img is file object io.BufferedReader
         # convert to base64 str to send through json
         byte_data = args.image_file.read()  # bytes
         byte_b64_str = base64.b64encode(byte_data).decode('utf-8') # base64 str
-        image_file(byte_b64_str, url=URL)
+        image_file(byte_b64_str, url=url)
     elif args.server_status:
-        status_url = URL + 'status'
+        url = URL + 'status'
         try:
-            status_code = server_status(url=status_url)
+            status_code = server_status(url=url)
         except requests.exceptions.ConnectionError:
            status_code = 400
-        print(status_code)
+        print(status_code, file=sys.stdout)
