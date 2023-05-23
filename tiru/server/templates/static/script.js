@@ -36,13 +36,13 @@ socket.on('stream_image', function (image_dict) {
 });
 
 
- // socket.on('stream_text', function (text) {
-     // // For <img id="photo" width="400" height="300">
-     // console.log("Received text!") 
-     // const parsed_text = "<h2>" + text + "</h2>"; 
-     // var text_el = document.getElementById("div_text_id")
-     // text_el.innerHTML = parsed_text;   
- // });
+socket.on('stream_text', function (text) {
+    // For <img id="photo" width="400" height="300">
+    console.log("Received text!") 
+    const parsed_text = "<h3>" + text + "</h3>"; 
+    var text_el = document.getElementById("div_text_id")
+    text_el.innerHTML = parsed_text;   
+});
  
 // window.onload = function () {
 //     var canvas = document.getElementById('canvas');

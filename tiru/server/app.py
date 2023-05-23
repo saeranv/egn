@@ -4,14 +4,16 @@ import cv2
 import numpy as np
 import numpy.typing as npt
 from flask import Flask, session, request, url_for
+from flask_session import Session
 from flask_socketio import SocketIO, emit
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 
 app = Flask(__name__, static_folder="./templates/static")
 app.config["SECRET_KEY"] = "secret!"
-socketio = SocketIO(app, async_mode="eventlet")
-STATE = session
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
+socketio = SocketIO(app, async_mode="eventlet", manage_session=False)
 PORT = 8100
 HOST = '127.0.0.1'
 ENV = Environment(
@@ -21,6 +23,10 @@ ENV = Environment(
     lstrip_blocks=True,         # remove leading space/tabs from block start
     keep_trailing_newline=True  # keep newline at end of template
 )
+
+session['text'] = []
+session['image'] = []
+
 
 @socketio.on("connect")
 def test_connect():
@@ -96,32 +102,26 @@ def image_file():
     # Use socketio.emit(), not emit() since emit() will send back to
     # original socketio.on event.
     socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
+    session['image'] += [image]
     return { 'statusCode': 200 }
 
 
-def text_file(data):
+@app.route("/text_file", methods=['POST'])
+def text_file():
     """Post text to tiru url."""
-    raw_text = data['message']
-    # socketio.emit('stream_text', text)
-    return raw_text.split('\n')
+    raw_text = request.get_json()['message']
+    session['text'] += [raw_text]
+    parsed_text = raw_text.replace('\n', '<br>')
+    socketio.emit('stream_text', parsed_text)
+    return { 'statusCode': 200 }
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Renders the index.html template."""
 
-    STATE['text'] = ['']
-    STATE['debug'] = 'a'
-    if request.method == 'POST':
-        text_ = text_file(request.get_json())
-        STATE['text'] = text_
-        STATE['debug'] = 'asfddasf'
-
-    debug = STATE['debug']
-    text = STATE['text']
-
-    # return render_template("index.html", debug=debug, text=text)
-    return ENV.get_template("index.html").render(debug=debug, text=text)
+    debug = session['text']
+    return ENV.get_template("index.html").render(url_for=url_for, debug=debug)
 
 if __name__ == "__main__":
     socketio.run(app, debug=True, port=PORT, host=HOST)
