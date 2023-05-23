@@ -3,6 +3,8 @@ var socket = io.connect(
     io_param, {transports: ['websocket']}
 );
 
+var IMAGE_WIDTH = 640;
+
 // Returns 'connect' data from test_connect function
 socket.on('connect', function () {
     console.log("Connected...!", socket.connected, 'at', io_param)
@@ -12,12 +14,20 @@ socket.on('connect', function () {
 });
 
 
-socket.on('stream_image', function (image) {
+socket.on('stream_image', function (image_dict) {
     // For <img id="image_id" src=...>
     console.log("Received img!") 
-    console.log(image.stats)
-    document.getElementById("image_id").setAttribute('src', image.data);
-    document.getElementById("image_text_id").innerHTML = image.stats;
+    var image = new Image();
+    image.src = image_dict.data;
+    var _width = IMAGE_WIDTH;
+    var _height = image.height * IMAGE_WIDTH / image.width;;
+    var image_str = "<br>ht: " + _height.toFixed(1) + " wt: " + _width;
+    var image_id = document.getElementById("image_id")  
+    image_id.setAttribute('src', image.src);
+    image_id.setAttribute('width', _width);
+    image_id.setAttribute('height', _height);
+    document.getElementById("image_text_id").innerHTML = image_dict.stats + image_str;
+    console.log(image_str)
 });
 
 
