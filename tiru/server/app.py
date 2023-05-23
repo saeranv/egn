@@ -13,6 +13,7 @@ STATE = session
 PORT = 8100
 HOST = '127.0.0.1'
 
+
 @socketio.on("connect")
 def test_connect():
     """Send message to client from server to confirm client-server connection.
@@ -92,12 +93,11 @@ def index():
     """Renders the index.html template."""
 
     if 'debug' not in STATE:
-        STATE['debug'] = ["first"]
+        STATE['debug'] = [""]
 
     debug = STATE['debug']
-    state = 'state-check'
-
-    return render_template("index.html", debug=debug, state=state)
+    state = ''
+    return render_template("index.html", debug=debug, state)
 
 
 if __name__ == "__main__":
