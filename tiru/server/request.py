@@ -56,7 +56,7 @@ if __name__ == "__main__":
         byte_b64_str = base64.b64encode(byte_data).decode('utf-8') # base64 str
         image_file(byte_b64_str, url=url)
     elif args.text_file:
-        url = URL + 'text_file'
+        url = URL
         text_file(args.text_file.read(), url=url)
     elif args.url:
         print(URL, file=sys.stdout)

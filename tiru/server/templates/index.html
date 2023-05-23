@@ -21,16 +21,13 @@
         <p id="image_text_id"></p>
         <img id="image_id">
     </div>
-    <div id="div_text_id">
-        {%- for t in text -%}
-        <h2>{{ t }}</h2>
-        {%- endfor -%}
-    </div>
+    <p>Testing</p> 
+    <p>{{ text }}</p>
     <div class="text_class">
         {%- for t in debug -%}
         <p>{{ t }}</p>
         {%- endfor -%}
     </div>
-    <script  src="{{ url_for('static',filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
   </body>
 </html>
