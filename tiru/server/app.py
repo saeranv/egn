@@ -46,7 +46,6 @@ def base64_to_image(base64_str:str)->npt.NDArray:
     image_bytes = base64.b64decode(base64_data)
     image_arr = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(image_arr, cv2.IMREAD_COLOR)
-    STATE['debug'] += [image_arr.shape, image_arr.dtype, image.shape, image.dtype]
     return image
 
 
@@ -72,20 +71,21 @@ def receive_image(image:str):
     image_uri = "data:image/jpg;base64," + image_uri_
     emit("processed_image", image_uri)
 
+
 @app.route("/status", methods=['GET'])
 def status():
     """Check if server is running."""
     return { 'statusCode': 200 }
 
+
 @app.route("/image_file", methods=['POST'])
 def image_file():
     """Post image to tiru url."""
-    # val = len(STATE['debug'])
-    # STATE['debug'] += [f'img-posted-{val}']
     image_uri_ = request.get_json()['message']
     # Use socketio.emit(), not emit() since emit() will send back to
     # original socketio.on event.
     image_uri = "data:image/jpg;base64," + image_uri_
+    STATE['debug'] += [image_arr.shape, image_arr.dtype, image.shape, image.dtype]
     socketio.emit('stream_image', image_uri)
 
 
@@ -103,9 +103,9 @@ def index():
     """Renders the index.html template."""
 
     if 'debug' not in STATE:
-        STATE['debug'] = [""]
+        STATE['debug'] = []
 
-    debug = STATE['debug']
+    debug = []
     return render_template("index.html", debug=debug)
 
 

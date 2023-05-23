@@ -13,7 +13,7 @@ socket.on('connect', function () {
 
 
 socket.on('stream_image', function (image_uri) {
-    // For <img id="photo" width="400" height="300">
+    // For <img id="image_id" src=...>
     console.log("Received img!") 
     document.getElementById("image_id").setAttribute('src', image_uri);
 });
