@@ -72,6 +72,11 @@ def receive_image(image:str):
     emit("processed_image", image_uri)
 
 
+def init_state(state):
+    state['debug'] = [] if 'debug' not in state else state['debug']
+    return state
+
+
 @app.route("/status", methods=['GET'])
 def status():
     """Check if server is running."""
@@ -81,12 +86,14 @@ def status():
 @app.route("/image_file", methods=['POST'])
 def image_file():
     """Post image to tiru url."""
-    image_uri_ = request.get_json()['message']
+    image_b64_str = request.get_json()['message']
+    image_data = "data:image/jpg;base64," + image_b64_str
+    image = base64_to_image(image_data)
+    image_stats = f"Image dim: {image.shape}, Image type: {image.dtype}"
     # Use socketio.emit(), not emit() since emit() will send back to
     # original socketio.on event.
-    image_uri = "data:image/jpg;base64," + image_uri_
-    STATE['debug'] += [image_arr.shape, image_arr.dtype, image.shape, image.dtype]
-    socketio.emit('stream_image', image_uri)
+    socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
+    return { 'statusCode': 200 }
 
 
 @app.route("/text", methods=['POST'])
@@ -101,10 +108,6 @@ def text_file():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Renders the index.html template."""
-
-    if 'debug' not in STATE:
-        STATE['debug'] = []
-
     debug = []
     return render_template("index.html", debug=debug)
 

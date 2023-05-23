@@ -12,10 +12,12 @@ socket.on('connect', function () {
 });
 
 
-socket.on('stream_image', function (image_uri) {
+socket.on('stream_image', function (image) {
     // For <img id="image_id" src=...>
     console.log("Received img!") 
-    document.getElementById("image_id").setAttribute('src', image_uri);
+    console.log(image.stats)
+    document.getElementById("image_id").setAttribute('src', image.data);
+    document.getElementById("image_text_id").innerHTML = image.stats;
 });
 
 
