@@ -88,6 +88,16 @@ def image_file():
     image_uri = "data:image/jpg;base64," + image_uri_
     socketio.emit('stream_image', image_uri)
 
+
+@app.route("/text", methods=['POST'])
+def text_file():
+    """Post text to tiru url."""
+    text = request.get_json()['message']
+    # Use socketio.emit(), not emit() since emit() will send back to
+    # original socketio.on event.
+    socketio.emit('stream_text', text)
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Renders the index.html template."""
@@ -96,8 +106,7 @@ def index():
         STATE['debug'] = [""]
 
     debug = STATE['debug']
-    state = ''
-    return render_template("index.html", debug=debug, state)
+    return render_template("index.html", debug=debug)
 
 
 if __name__ == "__main__":

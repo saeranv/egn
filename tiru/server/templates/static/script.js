@@ -6,15 +6,24 @@ var socket = io.connect(
 // Returns 'connect' data from test_connect function
 socket.on('connect', function () {
     console.log("Connected...!", socket.connected, 'at', io_param)
+    socket.on('disconnect', () => {
+        console.log("Disconnected...!", socket.connected)
+    })
 });
 
 
 socket.on('stream_image', function (image_uri) {
     // For <img id="photo" width="400" height="300">
-    console.log("Received!") 
-    photo.setAttribute('src', image_uri);
+    console.log("Received img!") 
+    document.getElementById("image_id").setAttribute('src', image_uri);
 });
 
+
+socket.on('stream_text', function (text) {
+    // For <img id="photo" width="400" height="300">
+    console.log("Received text!") 
+    document.getElementById("text_id").innerHTML = text;
+});
 
 // window.onload = function () {
 //     var canvas = document.getElementById('canvas');
