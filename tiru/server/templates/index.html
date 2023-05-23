@@ -21,7 +21,10 @@
         <p id="image_text_id"></p>
         <img id="image_id">
     </div>
-    <div id="div_text_id"> 
+    <div id="div_text_id">
+        {%- for t in text -%}
+        <h2>{{ t }}</h2>
+        {%- endfor -%}
     </div>
     <div class="text_class">
         {%- for t in debug -%}

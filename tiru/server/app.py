@@ -72,9 +72,11 @@ def receive_image(image:str):
     emit("processed_image", image_uri)
 
 
-def init_state(state):
-    state['debug'] = [] if 'debug' not in state else state['debug']
-    return state
+def init_state():
+    if 'debug' not in STATE:
+        STATE['debug'] = []
+    if 'text' not in STATE:
+        STATE['text'] = []
 
 
 @app.route("/status", methods=['GET'])
@@ -99,17 +101,19 @@ def image_file():
 @app.route("/text_file", methods=['POST'])
 def text_file():
     """Post text to tiru url."""
-    text = request.get_json()['message']
-    # Use socketio.emit(), not emit() since emit() will send back to
-    # original socketio.on event.
-    socketio.emit('stream_text', text)
+    text = request.get_json()['message'] + "\n"
+    STATE['text'] += [text]
+    # socketio.emit('stream_text', text)
+    return render_template("index.html", debug=[], text=text)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Renders the index.html template."""
-    debug = []
-    return render_template("index.html", debug=debug)
+    init_state()
+    debug = STATE['debug']
+    text = STATE['text']
+    return render_template("index.html", debug=debug, text=text)
 
 
 if __name__ == "__main__":
