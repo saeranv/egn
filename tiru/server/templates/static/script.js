@@ -17,16 +17,21 @@ socket.on('connect', function () {
 socket.on('stream_image', function (image_dict) {
     // For <img id="image_id" src=...>
     console.log("Received img!") 
+    // Modify image.data 
     var image = new Image();
     image.src = image_dict.data;
     var _width = IMAGE_WIDTH;
     var _height = image.height * IMAGE_WIDTH / image.width;;
-    var image_str = "<br>ht: " + _height.toFixed(1) + " wt: " + _width;
-    var image_id = document.getElementById("image_id")  
-    image_id.setAttribute('src', image.src);
-    image_id.setAttribute('width', _width);
-    image_id.setAttribute('height', _height);
-    document.getElementById("image_text_id").innerHTML = image_dict.stats + image_str;
+    // Modify stats 
+    var image_str = image_dict.stats 
+    image_str += `<br>pixel: (${image.height}, ${image.width}) / `;
+    image_str += `(${_height.toFixed(1)}, ${_width.toFixed(1)})`;
+    // Add image to DOM 
+    var image_el = document.getElementById("image_id")  
+    image_el.setAttribute('src', image.src);
+    image_el.setAttribute('width', _width);
+    image_el.setAttribute('height', _height);
+    document.getElementById("image_text_id").innerHTML = image_str;
     console.log(image_str)
 });
 
@@ -34,7 +39,11 @@ socket.on('stream_image', function (image_dict) {
 socket.on('stream_text', function (text) {
     // For <img id="photo" width="400" height="300">
     console.log("Received text!") 
-    document.getElementById("text_id").innerHTML = text;
+    var div_text = document.getElementById("div_text_id")
+    .innerHTML = 
+        {%- for t in debug -%}
+        <p>{{ t }}</p>
+        {%- endfor -%}
 });
 
 // window.onload = function () {

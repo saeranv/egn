@@ -89,14 +89,14 @@ def image_file():
     image_b64_str = request.get_json()['message']
     image_data = "data:image/jpg;base64," + image_b64_str
     image = base64_to_image(image_data)
-    image_stats = f"Image dim: {image.shape}, Image type: {image.dtype}"
+    image_stats = f"matrix: {image.shape[:2]}"
     # Use socketio.emit(), not emit() since emit() will send back to
     # original socketio.on event.
     socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
     return { 'statusCode': 200 }
 
 
-@app.route("/text", methods=['POST'])
+@app.route("/text_file", methods=['POST'])
 def text_file():
     """Post text to tiru url."""
     text = request.get_json()['message']

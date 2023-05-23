@@ -16,22 +16,18 @@
       <canvas id="canvas" width="400" height="300"></canvas>
     </div>
     -->
-    <div>
+    <div id='div_image_id'>
         <br> 
         <p id="image_text_id"></p>
         <img id="image_id">
     </div>
-    <div text="text_style"> 
-        <p id="text_id"></p>
+    <div id="div_text_id"> 
     </div>
     <div class="text_class">
-        <p>
-            {%- for t in debug -%}
-            <p>{{ t }}</p>
-            {%- endfor -%}
-        </p>
+        {%- for t in debug -%}
+        <p>{{ t }}</p>
+        {%- endfor -%}
     </div>
     <script  src="{{ url_for('static',filename='script.js') }}"></script>
   </body>
-
 </html>

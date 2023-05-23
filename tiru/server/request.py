@@ -14,6 +14,13 @@ def image_file(byte_str:str, url:str) -> None:
     data = {'message': byte_str}
     _ = requests.post(url, json=data)
 
+
+def text_file(text_str:str, url:str) -> None:
+    """Post image as base64 encoded string to server."""
+    data = {'message':text_str}
+    _ = requests.post(url, json=data)
+
+
 def status(url:str) -> int:
     """Check if server is running."""
     r = requests.get(url)
@@ -32,6 +39,8 @@ if __name__ == "__main__":
               '# To stream file as <stdin> use "-" as arg:\n'
               '$ cat img.jpg | request.py -img -\n'))
     parser.add_argument(
+        '-txt', '--text_file', type=FileType('r'))
+    parser.add_argument(
         '--status', action='store_true', default=False,
         help=('# Exit with status code 0 (success) if server else1\n'
               '$ [[ $(python request.py -stat) == "200" ]] && echo "Run."'))
@@ -46,6 +55,9 @@ if __name__ == "__main__":
         byte_data = args.image_file.read()  # bytes
         byte_b64_str = base64.b64encode(byte_data).decode('utf-8') # base64 str
         image_file(byte_b64_str, url=url)
+    elif args.text_file:
+        url = URL + 'text_file'
+        text_file(args.text_file.read(), url=url)
     elif args.url:
         print(URL, file=sys.stdout)
     elif args.status:
