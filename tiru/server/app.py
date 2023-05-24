@@ -8,12 +8,6 @@ from flask_socketio import SocketIO, emit
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 
-# For ezplt
-from io import BytesIO
-import numpy as np
-import matplotlib.pyplot as plt
-pp = print
-
 app = Flask(__name__, static_folder="./templates/static")
 app.config["SECRET_KEY"] = "secret!"
 socketio = SocketIO(app, async_mode="eventlet")
@@ -109,36 +103,14 @@ def image_file():
     return redirect(url_for('index'))
 
 
-@app.route("/ezplt_file", methods=['POST'])
-def ezplt_file():
-    """ezplt experiment."""
-
-    def subplots(row=1, col=1, dimx=10, dimy=7):
-        fig, ax = plt.subplots(row, col, figsize=(dimx, dimy))
-        ax = ax if isinstance(ax, np.ndarray) else [ax]
-        return ax
-
-    RAND = np.random.RandomState(101)
-    X = RAND.uniform(0, 1, 1000)
-    plt_str = request.get_json()['message']
-    plt_str_list = plt_str.strip().replace('\n', ';').split(';')
-    print(plt_str_list)
-    for i, p in enumerate(plt_str_list):
-        if len(p) == 0:
-          continue
-        print(p.strip())
-        exec(p.strip())
-        print(X.shape)
-    print('check shape', X.shape)
-    # # process evaluated data
-    # buffer = BytesIO()
-    # plt.savefig(buffer, format='jpg', bbox_inches='tight', dpi=150)
-    # buffer.seek(0)
-    # image_b64_str = buffer.getvalue().decode("utf-8")
-    # #sys.stdout.buffer.write(buffer.getvalue())
-    # image_data = "data:image/jpg;base64," + image_b64_str
-    # socketio.emit('stream_image', {'data':image_data, 'stats':"ezplt"})
-    return redirect(url_for('index'))
+# @app.route("/ezplt_file", methods=['POST'])
+# def ezplt_file():
+    # """ezplt experiment."""
+#
+    # # image_b64_str = buffer.getvalue().decode("utf-8")
+    # # image_data = "data:image/jpg;base64," + image_b64_str
+    # # socketio.emit('stream_image', {'data':image_data, 'stats':"ezplt"})
+    # # return redirect(url_for('index'))
 
 
 @app.route("/text_file", methods=['POST'])
