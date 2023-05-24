@@ -70,8 +70,7 @@ if __name__ == "__main__":
         url = URL + 'text_file'
         text_file(args.text_file.read(), url=url)
     elif args.ezplt_file:
-        url = URL + 'ezplt_file'
-        ezplt_file(args.ezplt_file.read())
+        print(args.ezplt_file.read())
     elif args.url:
         print(URL, file=sys.stdout)
     elif args.status:

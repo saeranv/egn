@@ -20,7 +20,7 @@ def plt_buffer(plt):
 
 
 def subplots(row=1, col=1, dimx=10, dimy=7):
-    fig, ax = plt.subplots(row, col, figsize=(dimx, dimy))
+    _, ax = plt.subplots(row, col, figsize=(dimx, dimy))
     ax = ax if isinstance(ax, np.ndarray) else [ax]
     return ax
 
