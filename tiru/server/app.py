@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 import numpy.typing as npt
 from flask import Flask, session, request, url_for, redirect
-from flask_session import Session
 from flask_socketio import SocketIO, emit
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -17,9 +16,7 @@ pp = print
 
 app = Flask(__name__, static_folder="./templates/static")
 app.config["SECRET_KEY"] = "secret!"
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
-socketio = SocketIO(app, async_mode="eventlet", manage_session=False)
+socketio = SocketIO(app, async_mode="eventlet")
 PORT = 8100
 HOST = '127.0.0.1'
 ENV = Environment(
