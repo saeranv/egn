@@ -1,5 +1,4 @@
 from sys import stdout
-from os import fdopen
 from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,30 +6,30 @@ pp = print
 
 RAND = np.random.RandomState(101)
 
-X = np.arange(1000)
-Y = np.arange(1000)
+X = RAND.uniform(0, 1, 1000)
 
-def subplots(row=1, col=1, dimx=7, dimy=10):
+
+def sp(row=1, col=1, dimx=10, dimy=7):
     fig, ax = plt.subplots(row, col, figsize=(dimx, dimy))
     ax = ax if isinstance(ax, np.ndarray) else [ax]
     return fig, ax
 
 
-def ezplt(X, Y, *args, **kwargs):
+def ezplt(xvec:np.ndarray, yvec:np.ndarray, plt_fn:str='scatter', *args, **kwargs) -> None:
     """Write binary data to stdout."""
 
-    ax = kwargs['ax'] if 'ax' in kwargs else subplots(1, 2)[1]
-    print(ax, len(ax))
-    print(subplots(1,1)[1])
+    axs = kwargs.pop('ax') if 'ax' in kwargs else sp()[1]
 
-    # buffer = BytesIO()
-    # ax.savefig(buffer, format='jpg')
-    # buffer.seek(0)
-    # stdout.buffer.write(buffer.getvalue())
-
-if __name__ == '__main__':
+    buffer = BytesIO()
+    for ax in axs:
+        ax = getattr(ax, plt_fn)(xvec, yvec, *args, **kwargs)
 
 
+    plt.savefig(buffer, format='jpg', bbox_inches='tight', dpi=150)
+    buffer.seek(0)
+    stdout.buffer.write(buffer.getvalue())
+    stdout.flush()
 
-    ezplt()
+# Add random value here for print from stdin to work.
+1
 
