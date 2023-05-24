@@ -92,17 +92,17 @@ def status():
 @app.route("/image_file", methods=['POST'])
 def image_file():
     """Post image to tiru url."""
+    BLANK_BYTE_STR = base64.b64encode(b'\n').decode("utf-8")  # blank byte as utf-8 str
     image_b64_str = request.get_json()['message']
-    image_data = "data:image/jpg;base64," + image_b64_str
-    image = base64_to_image(image_data)
-    if image is None:
-        image = np.zeros((0, 0, 3), dtype=np.uint8)
+    if BLANK_BYTE_STR == image_b64_str:
+        image_data = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAA"
+        image = np.zeros((1,1,3))
+    else:
+        image_data = "data:image/jpg;base64," + image_b64_str
+        image = base64_to_image(image_data)
     image_stats = f"matrix: {image.shape[:2]}"
-    # Use socketio.emit(), not emit() since emit() will send back to
-    # original socketio.on event.
+    # Use socketio.emit(), not emit() else sends to orig socketio.on event.
     socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
-    session['image'] += [image]
-    #return { 'statusCode': 200 }
     return redirect(url_for('index'))
 
 
@@ -114,6 +114,7 @@ def text_file():
     raw_text = request.get_json()['message']
     session['text'] += [raw_text]
     parsed_text = raw_text.replace('\n', '<br>')
+    # Use socketio.emit(), not emit() else sends to orig socketio.on event.
     socketio.emit('stream_text', parsed_text)
     #return { 'statusCode': 200 }
     return redirect(url_for('index'))
