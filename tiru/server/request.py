@@ -1,11 +1,22 @@
 from __future__ import annotations
 import sys
+import os
 import typing as typ
 import requests
 from argparse import ArgumentParser, FileType
 import base64
 
+CUR_DIR = os.path.abspath(os.path.dirname(__file__))
+PARENT_DIR = os.path.split(CUR_DIR)[0]
+print(PARENT_DIR)
+# sys.path.append('../..')
+
+
+
 URL = 'http://127.0.0.1:8100/'
+
+def ezplt(plt_str:str):
+    print(plt_str)
 
 # TODO: we want this to be used within python for visualization from .py
 # file editing.
@@ -41,6 +52,9 @@ if __name__ == "__main__":
     parser.add_argument(
         '-txt', '--text_file', type=FileType('r'))
     parser.add_argument(
+        '-ezplt', type=str,
+        help="X=np.random.uniform(0,1,1000); ezplt(X, np.sin(X), plt_fn='scatter', ax=subplots())")
+    parser.add_argument(
         '--status', action='store_true', default=False,
         help=('# Exit with status code 0 (success) if server else1\n'
               '$ [[ $(python request.py -stat) == "200" ]] && echo "Run."'))
@@ -58,6 +72,8 @@ if __name__ == "__main__":
     elif args.text_file:
         url = URL + 'text_file'
         text_file(args.text_file.read(), url=url)
+    elif args.ezplt:
+        ezplt(args.ezplt)
     elif args.url:
         print(URL, file=sys.stdout)
     elif args.status:
