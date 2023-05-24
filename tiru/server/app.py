@@ -126,9 +126,9 @@ def ezplt_file():
     for i, p in enumerate(plt_str_list):
         if len(p) == 0:
           continue
-        print(i, p)
-        # exec(p)
-        # print(X.shape)
+        print(p.strip())
+        exec(p.strip())
+        print(X.shape)
     print('check shape', X.shape)
     # # process evaluated data
     # buffer = BytesIO()
@@ -138,7 +138,7 @@ def ezplt_file():
     # #sys.stdout.buffer.write(buffer.getvalue())
     # image_data = "data:image/jpg;base64," + image_b64_str
     # socketio.emit('stream_image', {'data':image_data, 'stats':"ezplt"})
-    #return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 
 @app.route("/text_file", methods=['POST'])
