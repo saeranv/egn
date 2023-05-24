@@ -94,13 +94,15 @@ def image_file():
     """Post image to tiru url."""
     BLANK_BYTE_STR = base64.b64encode(b'\n').decode("utf-8")  # blank byte as utf-8 str
     image_b64_str = request.get_json()['message']
-    if BLANK_BYTE_STR == image_b64_str:
-        image_data = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAA"
-        image = np.zeros((1,1,3))
-    else:
-        image_data = "data:image/jpg;base64," + image_b64_str
+    image_data = "data:image/jpg;base64," + image_b64_str
+    image_stats = ""
+
+    if not BLANK_BYTE_STR == image_b64_str:
         image = base64_to_image(image_data)
-    image_stats = f"matrix: {image.shape[:2]}"
+        image_stats = f"matrix: {image.shape[:2]}"
+        # image_data = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAA"
+        # image = np.zeros((1,1,3))
+
     # Use socketio.emit(), not emit() else sends to orig socketio.on event.
     socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
     return redirect(url_for('index'))

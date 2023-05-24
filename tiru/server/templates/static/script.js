@@ -19,19 +19,17 @@ socket.on('stream_image', function (image_dict) {
     console.log("Received img!") 
     // Create image 
     var image = new Image();
+    var _width = image.width;
+    var _height = image.height;
     // Set source
     if (image_dict.stats !== "") {
         image.src = image_dict.data;
-        var _width = image.width;
-        var _height = image.height;
-    } else {
-        // Modify image.data 
-        var _width = IMAGE_WIDTH;
-        var _height = image.height * IMAGE_WIDTH / image.width;;
+        _width = IMAGE_WIDTH;
+        _height = image.height * IMAGE_WIDTH / image.width;;
     }
     // Modify stats 
     var image_str = image_dict.stats 
-    image_str += `<br>pixel: (${image.height}, ${image.width}) / `;
+    image_str += `; pixel: (${image.height}, ${image.width}) / `;
     image_str += `(${_height.toFixed(1)}, ${_width.toFixed(1)})`;
     // Add image to DOM 
     var image_el = document.getElementById("image_id")  
