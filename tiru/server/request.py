@@ -20,7 +20,7 @@ def image_file(byte_str:str, url:str) -> None:
 
 def ezplt_file(plt_str:str) -> None:
     data = {'message':plt_str}
-    _ = requests.post(url, json=data)
+    # python -c "$(cat ./ezplt.py) $(printf 'print("hello")')"
 
 
 def text_file(text_str:str, url:str) -> None:
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         '-txt', '--text_file', type=FileType('r'))
     parser.add_argument(
         '-ezplt', '--ezplt_file', type=FileType('r'),
-        help="X=np.random.uniform(0,1,1000); ezplt(X, np.sin(X), plt_fn='scatter', ax=subplots())")
+        help="X=np.random.uniform(0,1,1000); plt.scatter(X, np.sin(X), ax=subplots())")
     parser.add_argument(
         '--status', action='store_true', default=False,
         help=('# Exit with status code 0 (success) if server else1\n'

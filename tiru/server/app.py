@@ -103,16 +103,6 @@ def image_file():
     return redirect(url_for('index'))
 
 
-# @app.route("/ezplt_file", methods=['POST'])
-# def ezplt_file():
-    # """ezplt experiment."""
-#
-    # # image_b64_str = buffer.getvalue().decode("utf-8")
-    # # image_data = "data:image/jpg;base64," + image_b64_str
-    # # socketio.emit('stream_image', {'data':image_data, 'stats':"ezplt"})
-    # # return redirect(url_for('index'))
-
-
 @app.route("/text_file", methods=['POST'])
 def text_file():
     """Post text to tiru url."""
