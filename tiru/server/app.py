@@ -8,6 +8,11 @@ from flask_session import Session
 from flask_socketio import SocketIO, emit
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+# For ezplt
+from io import BytesIO
+import numpy as np
+import matplotlib.pyplot as plt
+pp = print
 
 app = Flask(__name__, static_folder="./templates/static")
 app.config["SECRET_KEY"] = "secret!"
@@ -100,10 +105,43 @@ def image_file():
     if not BLANK_BYTE_STR == image_b64_str:
         image = base64_to_image(image_data)
         image_stats = f"matrix: {image.shape[:2]}"
-        # image_data = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAA"
-        # image = np.zeros((1,1,3))
 
     # Use socketio.emit(), not emit() else sends to orig socketio.on event.
+    socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
+    return redirect(url_for('index'))
+
+
+@app.route("/ezplt_file", methods=['POST'])
+def ezplt_file():
+    """ezplt experiment."""
+
+    def subplots(row=1, col=1, dimx=10, dimy=7):
+        fig, ax = plt.subplots(row, col, figsize=(dimx, dimy))
+        ax = ax if isinstance(ax, np.ndarray) else [ax]
+        return fig, ax
+
+
+    def ezplt(x:np.ndarray, y:np.ndarray, plt_fn:str='scatter',
+              *args, **kwargs) -> None:
+        """Write binary data to stdout."""
+        axs = kwargs.pop('ax') if 'ax' in kwargs else subplots()[1]
+
+        buffer = BytesIO()
+        axs = [getattr(ax, plt_fn)(x, y, *args, **kwargs)
+               for ax in axs]
+
+        plt.savefig(buffer, format='jpg', bbox_inches='tight', dpi=150)
+        buffer.seek(0)
+        image_b64_str = buffer.getvalue().decode("utf-8")
+        #sys.stdout.buffer.write(buffer.getvalue())
+        #sys.stdout.flush()
+        return image_b64_str
+
+    plt_str = request.get_json()['message']
+    RAND = np.random.RandomState(101)
+    X = RAND.uniform(0, 1, 1000)
+    [eval(s) for s in plt_str.split(';')]
+
     socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
     return redirect(url_for('index'))
 
