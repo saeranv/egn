@@ -7,6 +7,8 @@ from flask import Flask, session, request, url_for, redirect
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 from jinja2 import Environment, PackageLoader, select_autoescape
+import traceback
+
 
 # For ezplt
 from io import BytesIO
@@ -118,31 +120,22 @@ def ezplt_file():
     def subplots(row=1, col=1, dimx=10, dimy=7):
         fig, ax = plt.subplots(row, col, figsize=(dimx, dimy))
         ax = ax if isinstance(ax, np.ndarray) else [ax]
-        return fig, ax
+        return ax
 
-
-    def ezplt(x:np.ndarray, y:np.ndarray, plt_fn:str='scatter',
-              *args, **kwargs) -> None:
-        """Write binary data to stdout."""
-        axs = kwargs.pop('ax') if 'ax' in kwargs else subplots()[1]
-
-        buffer = BytesIO()
-        axs = [getattr(ax, plt_fn)(x, y, *args, **kwargs)
-               for ax in axs]
-
-        plt.savefig(buffer, format='jpg', bbox_inches='tight', dpi=150)
-        buffer.seek(0)
-        image_b64_str = buffer.getvalue().decode("utf-8")
-        #sys.stdout.buffer.write(buffer.getvalue())
-        #sys.stdout.flush()
-        return image_b64_str
-
-    plt_str = request.get_json()['message']
     RAND = np.random.RandomState(101)
     X = RAND.uniform(0, 1, 1000)
-    [eval(s) for s in plt_str.split(';')]
+    plt_str = request.get_json()['message']
+    for p in plt_str.split(';'):
+        exec(p)
 
-    socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
+    # process evaluated data
+    buffer = BytesIO()
+    plt.savefig(buffer, format='jpg', bbox_inches='tight', dpi=150)
+    buffer.seek(0)
+    image_b64_str = buffer.getvalue().decode("utf-8")
+    #sys.stdout.buffer.write(buffer.getvalue())
+    image_data = "data:image/jpg;base64," + image_b64_str
+    socketio.emit('stream_image', {'data':image_data, 'stats':"ezplt"})
     return redirect(url_for('index'))
 
 
@@ -170,5 +163,8 @@ def index():
     return ENV.get_template("index.html").render(url_for=url_for, debug=debug)
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, port=PORT, host=HOST)
-
+    try:
+        socketio.run(app, debug=True, port=PORT, host=HOST)
+    except:
+       error_msg = traceback.format_exc()
+       print(error_msg)

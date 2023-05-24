@@ -20,9 +20,7 @@ def image_file(byte_str:str, url:str) -> None:
 
 def ezplt_file(plt_str:str) -> None:
     data = {'message':plt_str}
-    r = requests.post(url, json=data)
-    data = r.body['data']
-    print(data)
+    _ = requests.post(url, json=data)
 
 
 def text_file(text_str:str, url:str) -> None:
@@ -73,7 +71,7 @@ if __name__ == "__main__":
         text_file(args.text_file.read(), url=url)
     elif args.ezplt_file:
         url = URL + 'ezplt_file'
-        ezplt_file(args.ezplt_file)
+        ezplt_file(args.ezplt_file.read())
     elif args.url:
         print(URL, file=sys.stdout)
     elif args.status:
