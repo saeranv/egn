@@ -21,10 +21,12 @@
         <p id="image_text_id"></p>
         <img id="image_id">
     </div>
+    <div id='split_id'>---------------------------------------<br></div> 
     <div id='div_text_id'></div>
+    <div id='split_id'>---------------------------------------<br></div> 
     <div id="div_debug_id">
-        {%- for t in debug -%}
-        <p>{{ t }}</p>
+        {%- for d in debug -%}
+        {{ d }}<br>
         {%- endfor -%}
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>

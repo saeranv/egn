@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 import numpy.typing as npt
-from flask import Flask, session, request, url_for
+from flask import Flask, session, request, url_for, redirect
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -95,33 +95,37 @@ def image_file():
     image_b64_str = request.get_json()['message']
     image_data = "data:image/jpg;base64," + image_b64_str
     image = base64_to_image(image_data)
+    if image is None:
+        image = np.zeros((0, 0, 3), dtype=np.uint8)
     image_stats = f"matrix: {image.shape[:2]}"
     # Use socketio.emit(), not emit() since emit() will send back to
     # original socketio.on event.
     socketio.emit('stream_image', {'data':image_data, 'stats':image_stats})
     session['image'] += [image]
-    return { 'statusCode': 200 }
+    #return { 'statusCode': 200 }
+    return redirect(url_for('index'))
 
 
 @app.route("/text_file", methods=['POST'])
 def text_file():
     """Post text to tiru url."""
-    if not {'text', 'img'}.intersection(session.keys()):
-        session['text'], session['img'] = [], []
+    if 'text' not in session:
+        session['text'] = []
     raw_text = request.get_json()['message']
     session['text'] += [raw_text]
     parsed_text = raw_text.replace('\n', '<br>')
     socketio.emit('stream_text', parsed_text)
-    return { 'statusCode': 200 }
+    #return { 'statusCode': 200 }
+    return redirect(url_for('index'))
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Renders the index.html template."""
-    if 'text' not in session:
-        session['text'], session['img'] = [], []
-
-    debug = [f'State: {len(session["text"])}']
+    if not {'text', 'image'}.issubset(session.keys()):
+        session['text'], session['image'] = [], []
+    # Use redis.. don't want to deal w/ cookies
+    debug = [f'image-state:{len(session["image"])}', f'text-state: {len(session["text"])}']
     return ENV.get_template("index.html").render(url_for=url_for, debug=debug)
 
 if __name__ == "__main__":
