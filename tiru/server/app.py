@@ -24,9 +24,6 @@ ENV = Environment(
     keep_trailing_newline=True  # keep newline at end of template
 )
 
-session['text'] = []
-session['image'] = []
-
 
 @socketio.on("connect")
 def test_connect():
@@ -109,6 +106,8 @@ def image_file():
 @app.route("/text_file", methods=['POST'])
 def text_file():
     """Post text to tiru url."""
+    if not {'text', 'img'}.intersection(session.keys()):
+        session['text'], session['img'] = [], []
     raw_text = request.get_json()['message']
     session['text'] += [raw_text]
     parsed_text = raw_text.replace('\n', '<br>')
@@ -119,8 +118,10 @@ def text_file():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """Renders the index.html template."""
+    if 'text' not in session:
+        session['text'], session['img'] = [], []
 
-    debug = session['text']
+    debug = [f'State: {len(session["text"])}']
     return ENV.get_template("index.html").render(url_for=url_for, debug=debug)
 
 if __name__ == "__main__":
