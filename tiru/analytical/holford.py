@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 """
 Models naturally ventilated space with internal thermal mass in response to
 harmonic variation in T_ext. T_int is function of heat balance between
-thermal mass (C m = kg J/kgK), and environment
+thermal mass (C m = kg J/kgK), and environment via natvent (vol_nv/s = m3/s).
 
-Should reduce hot
-temperature significantly when T_ext >= T_int, if building is thermally
-massive.
+Dynamic:
+- When T_ext >= T_int, Cm inversely correlates to T_int (<< Cm leads to >> T_int).
+- When >> q_int, >> diurnal T_int varies from T_ext widely.
+- When << q_int, closely follows T_ext. B/c << q_int drives << vol_nv/s. While
+  T_int is higher, expect more rapid flushing due to higher temperature delta.
 
-If internal gains are small, diurnal variations are high.
 
 
 
@@ -22,7 +23,7 @@ Assumes:
 - internal walls are adiabatic
 - no solar gains
 
-
+Thermally massive buildings
 
 """
 
