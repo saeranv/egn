@@ -10,8 +10,8 @@ thermal mass (C m = kg J/kgK), and environment via natvent (vol_nv/s = m3/s).
 
 Dynamic:
 - When T_ext >= T_int, Cm inversely correlates to T_int (<< Cm leads to >> T_int).
-- When >> q_int, >> diurnal T_int varies from T_ext widely.
-- When << q_int, closely follows T_ext. B/c << q_int drives << vol_nv/s. While
+- When << q_int, >> diurnal swing b/c T_int varies from T_ext widely.
+- When >> q_int, << diurnal swings b/c loosely follows T_ext. B/c << q_int drives << vol_nv/s. While
   T_int is higher, expect more rapid flushing due to higher temperature delta.
 
 
