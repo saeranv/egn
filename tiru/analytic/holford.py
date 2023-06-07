@@ -20,8 +20,6 @@ Assumes as constant:
 - >> internal gains
 - internal walls are adiabatic
 - no solar gains
-
-Thermally massive buildings
-
 """
+
 
