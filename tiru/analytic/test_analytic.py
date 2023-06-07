@@ -33,8 +33,8 @@ def test_newton():
     assert isinstance(T_int, np.ndarray), type(T_int)
     assert T_int.shape == (Nt/dt,), T_int.shape
     assert T_int_0 > T_ext
-    assert T_int[0] == T_int_0, T_int[0]
-    assert T_int[1] < T_int_0, T_int[0]
+    assert T_int[0] == T_int_0
+    assert T_int[1] < T_int_0
     assert abs(np.min(T_int) - T_int[-1]) <= 1e-10
 
 

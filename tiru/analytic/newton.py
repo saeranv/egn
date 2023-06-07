@@ -32,6 +32,7 @@ def newton(
     # TODO: clarify Cp against Cv
     # Rough check of physically possible
     eps = 1e-10
+    T_int_0,  T_ext = T_int_0 + 273.15, T_ext + 273.15
     assert h_c >= eps
     assert A >= eps
     assert Cp >= eps
@@ -39,11 +40,12 @@ def newton(
     assert p >= eps
     assert dt >= eps
     assert Nt >= dt
+    assert T_int_0 >= eps
+    assert T_ext >= eps
 
-    # Convert to K
-    T_int_0,  T_ext = T_int_0 - 273.15, T_ext - 273.15
-    assert T_int_0 >= 273.15 + eps
-    assert T_ext >= 273.15 + eps
+    t_steps = int(Nt / dt)
+    T_arr = np.zeros(t_steps, dtype=np.float64)
 
 
+    return T_arr
 
