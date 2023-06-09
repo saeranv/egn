@@ -26,9 +26,13 @@ def newton(
         T(t) = (T(0) - T_ext) exp(a t) + T_ext
 
     2. Derivation of a, diffusivity coefficient.
+        ; balance for lumped node
+        dT(x,t)/dt = a d2T(x,t)/dx2
+        T[i] - T[i+1] / dt = a d[T[i] - T_ext] / dx2
+        T[i] - T[i+1] / dt = (h / V p C) d[T[i] - T_ext] / dx2
 
 
-    Args:
+    krgs:
         # Diffusivity (alpha) params: hA/pCV
         h_c: Node surface convective coefficient [W/m2-K]
         A: Node surface area [m2]
@@ -62,8 +66,9 @@ def newton(
     assert T_ext >= eps
 
     t_steps = int(Nt / dt)
-    T_arr = np.zeros(t_steps, dtype=np.float64)
+    T = np.zeros(t_steps, dtype=np.float64)
 
+    # dT/dx
 
-    return T_arr
+    return T
 
