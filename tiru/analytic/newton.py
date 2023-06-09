@@ -25,14 +25,19 @@ def newton(
         T(t) - T_ext = C exp(a t), b/c y(t) = T(t) - T_ext
         T(t) = (T(0) - T_ext) exp(a t) + T_ext
 
-    2. Derivation of a, diffusivity coefficient.
+    2. Derivation of the diffusivity coefficient (a).
         ; balance for lumped node
-        dT(x,t)/dt = a d2T(x,t)/dx2
-        T[i] - T[i+1] / dt = a d[T[i] - T_ext] / dx2
-        T[i] - T[i+1] / dt = (h / V p C) d[T[i] - T_ext] / dx2
+        d(T-T_ext)/dt = (hA/VpC) (T-T_ext)
+        ; Set T-T_ext) as DT
+        dDT/dt = (hA/VpC) DT
+        ; since dDT/dt ~ DT; DT(t) is exp fn
+        DT(t) = DT(0) exp[(hA/VpC) t]
+        dDT/dt = (hA/VpC) DT0 exp[(hA/VpC) t]
+        dDT/dt = a DT0 exp(a t); from above
+        dDT/dt = a DT
+        ; Thus a = hA/VpC
 
-
-    krgs:
+    Args:
         # Diffusivity (alpha) params: hA/pCV
         h_c: Node surface convective coefficient [W/m2-K]
         A: Node surface area [m2]
