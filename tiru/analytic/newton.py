@@ -8,34 +8,26 @@ def newton(
     T_int_0, T_ext,
     dt, Nt
     ) -> np.ndarray:
-    """Predict array of temperatures for node given parameters.
+    """Predict array of temperatures for lumped node given parameters.
 
-    1. Derivation of T(t) = (T0 - T_ext) exp(a t) + T_ext
-    Newton's law states that temperature rate of lumped node decreases in
-    proportion to difference of ambient temperature.
-        dT/dt = K T - T_ext; where K is some constant of proportionality
-        y(t) = T(t) - T_ext
-        ; Simplify spatial diff as y
-        dy  = dT = (T_1 - T_ext) - (T_0 - T_ext)
-        dy/dt = K y.
-        ; As exponential fn
-        y(t) = C exp(a t)
-        dy/dt = a C exp(a t); where C = y(0) = C exp(a 0)
-        ; Substitute back original variables:
-        T(t) - T_ext = C exp(a t), b/c y(t) = T(t) - T_ext
-        T(t) = (T(0) - T_ext) exp(a t) + T_ext
+    Assumes node is spatially isothermal (Bi < 0.1), and ambient temperature
+    is a constant uniform temperature. Thus no meaningful temperature gradient
+    within node, and entire node decays exponentially to ambient temp,
+    according to,
+        T(t) = (T0 - T_ext) exp(b t) + T_ext.
 
-    2. Derivation of the diffusivity coefficient (a).
-        ; balance for lumped node
-        d(T-T_ext)/dt = (hA/VpC) (T-T_ext)
-        ; Set T-T_ext) as DT
-        dDT/dt = (hA/VpC) DT
-        ; since dDT/dt ~ DT; DT(t) is exp fn
-        DT(t) = DT(0) exp[(hA/VpC) t]
-        dDT/dt = (hA/VpC) DT0 exp[(hA/VpC) t]
-        dDT/dt = a DT0 exp(a t); from above
-        dDT/dt = a DT
-        ; Thus a = hA/VpC
+    Derivation follows from an energy balance for the lumped node,
+        d(T-T_ext)/dt = (hA/VpC) (T-T_ext),
+    then set T-T_ext) as DT, reveals DT(t) as exp function since dDT/dt ~ DT,
+        dDT/dt = (hA/VpC) DT, thus
+        DT(t) = DT(0) exp[(hA/VpC) t],
+        dDT/dt = (hA/VpC) DT0 exp[(hA/VpC) t].
+    To get original eqn we can simplify (hA/VpC) as b, and expand DT,
+        b = hA/VpC; the time constant [s^-1] (Cengel, p.239)
+        DT(t) = DT(0) exp(b t),
+        (T(t) - T_ext) = (T(0) - T_ext) exp(b t),
+    resulting in original eqn:
+        T(t) = (T(0) - T_ext) exp(b t) + T_ext.
 
     Args:
         # Diffusivity (alpha) params: hA/pCV
@@ -75,5 +67,12 @@ def newton(
 
     # dT/dx
 
+    # The time constant can be rewritten as (Fo Bi)/t,
+        # Lc = V_mass / A_srf; characteristic length [m]
+        # a = k/pC; thermal diffusivity
+        # Bi = hLc/k; since R = L/k can intuit Bi = hR
+        # Fo = at/L2 = kt/L2pC
+        # (Bi Fo)/t = (hLc/k kt/L2pC)/t = h/LpC
+              # = hA/VpC; since A/V = L
     return T
 
