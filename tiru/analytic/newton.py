@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def newton(
     h_c, A, Cp, Vol, p,
-    T_int_0, T_ext,
+    T0, T_ext,
     dt, Nt
     ) -> np.ndarray:
     """Predict array of temperatures for lumped node given parameters.
@@ -51,7 +51,7 @@ def newton(
     # TODO: clarify Cp against Cv
     # Rough check of physically possible
     eps = 1e-10
-    T_int_0,  T_ext = T_int_0 + 273.15, T_ext + 273.15
+    T0,  T_ext = T0 + 273.15, T_ext + 273.15
     assert h_c >= eps
     assert A >= eps
     assert Cp >= eps
@@ -59,20 +59,35 @@ def newton(
     assert p >= eps
     assert dt >= eps
     assert Nt >= dt
-    assert T_int_0 >= eps
+    assert T0 >= eps
     assert T_ext >= eps
 
     t_steps = int(Nt / dt)
     T = np.zeros(t_steps, dtype=np.float64)
 
-    # dT/dx
+    # Simplify to dimensionless params: Fo/tau, Bi, theta so we can rewrite
+    #    T(t)-T_ext = T0 exp(b t)
+    #    dT/dt = b T(t),
+    # as:
+    #    theta(tau) = exp(Bi tau)
+    #    d_theta/d_tau = Bi theta(tau).
+    # Derivation:
+    #     _Lc = V_mass / A_srf; characteristic length [m]
+    #     _a = k/pC; thermal diffusivity
+    #     Bi = h_Lc/k; since R = L/k can intuit Bi = hR
+    #     tau = _at/L2 = kt/L2pC
+    #     theta = (T - T_ext) / (T0 - T_ext)
 
-    # The time constant can be rewritten as (Fo Bi)/t,
-        # Lc = V_mass / A_srf; characteristic length [m]
-        # a = k/pC; thermal diffusivity
-        # Bi = hLc/k; since R = L/k can intuit Bi = hR
-        # Fo = at/L2 = kt/L2pC
-        # (Bi Fo)/t = (hLc/k kt/L2pC)/t = h/LpC
-              # = hA/VpC; since A/V = L
+
+    # Note tau Bi equals exponent coefficient:
+    # Bi tau = hLc/k kt/L2pC = h/LpC t
+    #        = (hA/VpC) t; since A/V = L
+
+    k, L = 1, 1
+    _a = k / p * Cp  # k/pC
+    t_to_tau = lambda t: (_a * t) / (L*L)
+    theta = lambda tau: (T[tau_to_t(tau)] - T_ext) / (T0 - T_ext)
+
+
     return T
 
