@@ -3,10 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def transient_lumped(
-    h_c, A, Cp, Vol, p,
-    T0, T_ext,
-    tn, nt
+def encode_transient_lumped_params(
+    h_c, A,      # surface params
+    Cp, Vol, p,  # mass params
+    T0, T_ext,   # initial and external temps
+    tn, dt=1.0   # time params
     ) -> np.ndarray:
     """Predict array of temperatures for lumped node given parameters.
 
@@ -44,6 +45,7 @@ def transient_lumped(
 
         # Time params
         tn: time at step n (final time) [s]
+        dt: (optional) time step [s]
 
     Returns (tot_t/dt) array of temperatures.
     """
@@ -51,7 +53,8 @@ def transient_lumped(
     assert T0 > -273.15; assert T_ext > -273.15
     assert h_c >= eps; assert A >= eps
     assert Cp >= eps; assert Vol >= eps; assert p >= eps
-    assert isinstance(tn, int);  assert tn >= eps;
+    assert isinstance(tn, int);  assert tn >= eps; assert dt > eps
+
     # Convert to K
     T0 += 273.15; T_ext += 273.15 # K
 
@@ -74,11 +77,10 @@ def transient_lumped(
     #        = (hA/VpC) t; since A/V = L
 
     # Time params
-    dt = 1.0 # timestep
     Nt = int(tn / dt)  # number of timesteps
     t_vec = np.linspace(0, tn, Nt).astype(int)
     tau_vec = np.zeros(Nt).astype(np.float64)
-    # Delete?
+    # TODO: delete
     assert t_vec.size == tau_vec.size
 
     # Intermediate params
@@ -90,18 +92,11 @@ def transient_lumped(
     # Main dimensionless params theta, tau, Bi
     Bi = (h_c * _Lc) / _k  # Bi = h Lc / k
     tau = (_a * t) / _Lc2  # tau = a t / Lc2
-    theta = np.zeros(Nt, dtype=np.float64)
 
-    theta = transient_dimensionless(Bi, tau)
-
-
-    # theta = (T - T_ext) / (T0 - T_ext)
-    #T =  (theta * (T0 - T_ext)) + T_ext)
-
-    return T
+    return Bi, tau
 
 
-def transient_dimensionless(Bi, tau):
+def transient_lumped(Bi, tau):
     """Dimensionless transient lumped node eqn.
 
     Solves for theta given Bi and tau,
@@ -113,4 +108,23 @@ def transient_dimensionless(Bi, tau):
 
     Returns dimensionless temp, theta = (T - T_ext) / (T0 - T_ext) [-]
     """
+    #T =  (theta * (T0 - T_ext)) + T_ext)
     return np.exp(Bi * tau)
+
+
+def decode_transient_params(theta, T0, T_ext):
+    """."""
+    # theta = (T - T_ext) / (T0 - T_ext)
+    T = (theta * (T0 - T_ext)) + T_ext
+    return T
+
+def main(
+    h_c, A,      # surface params
+    Cp, Vol, p,  # mass params
+    T0, T_ext,   # initial and external temps
+    tn, dt=1.0   # time params
+):
+    Bi, tau = encode_transient_lumped_params(h_c, A, Cp, Vol, p, T0, T_ext, tn, dt)
+    theta = transient_lumped(Bi, tau)
+    T = decode_transient_params(theta, T0, T_ext)
+    return T
