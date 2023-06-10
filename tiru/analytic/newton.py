@@ -17,16 +17,17 @@ def newton(
         T(t) = (T0 - T_ext) exp(b t) + T_ext.
 
     Derivation follows from an energy balance for the lumped node,
+    Eqn 1.
         d(T-T_ext)/dt = (hA/VpC) (T-T_ext),
-    then set T-T_ext) as DT, reveals DT(t) as exp function since dDT/dt ~ DT,
+    ;then set T-T_ext) as DT, reveals DT(t) as exp function since dDT/dt ~ DT,
         dDT/dt = (hA/VpC) DT, thus
         DT(t) = DT(0) exp[(hA/VpC) t],
         dDT/dt = (hA/VpC) DT0 exp[(hA/VpC) t].
-    To get original eqn we can simplify (hA/VpC) as b, and expand DT,
+    ;To get original eqn we can simplify (hA/VpC) as b, and expand DT,
         b = hA/VpC; the time constant [s^-1] (Cengel, p.239)
         DT(t) = DT(0) exp(b t),
         (T(t) - T_ext) = (T(0) - T_ext) exp(b t),
-    resulting in original eqn:
+    ;resulting in original eqn:
         T(t) = (T(0) - T_ext) exp(b t) + T_ext.
 
     Args:
@@ -48,8 +49,6 @@ def newton(
     Returns (Nt/dt) array of temperatures.
     """
 
-    # TODO: clarify Cp against Cv
-    # Rough check of physically possible
     eps = 1e-10
     T0,  T_ext = T0 + 273.15, T_ext + 273.15
     assert h_c >= eps
@@ -71,21 +70,27 @@ def newton(
     # as:
     #    theta(tau) = exp(Bi tau)
     #    d_theta/d_tau = Bi theta(tau).
-    # Derivation:
+    # Eqn 2.
+    #     theta = (T - T_ext) / (T0 - T_ext)
     #     _Lc = V_mass / A_srf; characteristic length [m]
     #     _a = k/pC; thermal diffusivity
-    #     Bi = h_Lc/k; since R = L/k can intuit Bi = hR
-    #     tau = _at/L2 = kt/L2pC
-    #     theta = (T - T_ext) / (T0 - T_ext)
+    #     Bi = h._Lc/k; since R = L/k can intuit Bi = hR
+    #     tau = _a.t/L2 = kt/L2pC
 
 
     # Note tau Bi equals exponent coefficient:
+    # Eqn 3.
     # Bi tau = hLc/k kt/L2pC = h/LpC t
     #        = (hA/VpC) t; since A/V = L
 
-    k, L = 1, 1
-    _a = k / p * Cp  # k/pC
-    t_to_tau = lambda t: (_a * t) / (L*L)
+    _Lc = A / Vol  # characteristic lenght [m]
+    _Lc2 = _Lc * _Lc
+    _k = 1  # _k of node cancels out (see eqn 3), so just make 1
+    _a = _k / p * Cp  # diffusivity k/pC
+
+    t_to_tau = lambda t: (_a * t) / _Lc2
+
+
     theta = lambda tau: (T[tau_to_t(tau)] - T_ext) / (T0 - T_ext)
 
 
