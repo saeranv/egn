@@ -44,7 +44,7 @@ def newton(
 
         # Time params
         dt: time step [s]
-        Nt: total time elapsed [s]
+        tot_t: total time [s]
 
     Returns (Nt/dt) array of temperatures.
     """
@@ -86,10 +86,7 @@ def newton(
     Bi = (h_c * _Lc) / _k  # Bi = h Lc / k
     tau = (_a * t) / _Lc2  # tau = a t / Lc2
     theta = np.zeros(t_steps, dtype=np.float64)
-    lambda tau: (T - T_ext) / (T0 - T_ext)
-
-
-
+    # lambda tau: (T - T_ext) / (T0 - T_ext)
 
     return T
 
