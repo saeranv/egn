@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def newton(
+def transient_lumped(
     h_c, A, Cp, Vol, p,
     T0, T_ext,
-    dt, Nt
+    tn, nt
     ) -> np.ndarray:
     """Predict array of temperatures for lumped node given parameters.
 
@@ -43,16 +43,17 @@ def newton(
         T_ext: Ambient temperature [C]
 
         # Time params
-        dt: time step [s]
-        tot_t: total time [s]
+        tn: time at step n (final time) [s]
 
-    Returns (Nt/dt) array of temperatures.
+    Returns (tot_t/dt) array of temperatures.
     """
     eps = 1e-10
     assert T0 > -273.15; assert T_ext > -273.15
     assert h_c >= eps; assert A >= eps
     assert Cp >= eps; assert Vol >= eps; assert p >= eps
-    assert dt >= eps; assert Nt >= dt
+    assert isinstance(tn, int);  assert tn >= eps;
+    # Convert to K
+    T0 += 273.15; T_ext += 273.15 # K
 
     # Simplify to 4 dimensionless params:
     # theta, tau, Bi, so we can rewrite
@@ -72,9 +73,13 @@ def newton(
     # Bi tau = hLc/k kt/L2pC = h/LpC t
     #        = (hA/VpC) t; since A/V = L
 
-    T0 += 273.15 # K
-    T_ext += 273.15 # K
-    t_steps = int(Nt / dt)
+    # Time params
+    dt = 1.0 # timestep
+    Nt = int(tn / dt)  # number of timesteps
+    t_vec = np.linspace(0, tn, Nt).astype(int)
+    tau_vec = np.zeros(Nt).astype(np.float64)
+    # Delete?
+    assert t_vec.size == tau_vec.size
 
     # Intermediate params
     _Lc = A / Vol  # characteristic lenght [m]
@@ -85,8 +90,27 @@ def newton(
     # Main dimensionless params theta, tau, Bi
     Bi = (h_c * _Lc) / _k  # Bi = h Lc / k
     tau = (_a * t) / _Lc2  # tau = a t / Lc2
-    theta = np.zeros(t_steps, dtype=np.float64)
-    # lambda tau: (T - T_ext) / (T0 - T_ext)
+    theta = np.zeros(Nt, dtype=np.float64)
+
+    theta = transient_dimensionless(Bi, tau)
+
+
+    # theta = (T - T_ext) / (T0 - T_ext)
+    #T =  (theta * (T0 - T_ext)) + T_ext)
 
     return T
 
+
+def transient_dimensionless(Bi, tau):
+    """Dimensionless transient lumped node eqn.
+
+    Solves for theta given Bi and tau,
+        theta(tau) = exp(Bi tau)
+
+    Args:
+        Bi: Biot number = h Lc / k [-]
+        tau: dimensionless time = a t / Lc2 [-]
+
+    Returns dimensionless temp, theta = (T - T_ext) / (T0 - T_ext) [-]
+    """
+    return np.exp(Bi * tau)
