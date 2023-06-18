@@ -123,7 +123,7 @@ def main(
     Cp, Vol, p,  # mass params
     T0, T_ext,   # initial and external temps
     tn, dt=1.0   # time params
-):
+    ):
     Bi, tau = encode_transient_lumped_params(h_c, A, Cp, Vol, p, T0, T_ext, tn, dt)
     theta = transient_lumped(Bi, tau)
     T = decode_transient_params(theta, T0, T_ext)
