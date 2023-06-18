@@ -44,6 +44,24 @@ def fourier_coef(alpha:float, char_len:float, dt:float) -> float:
     return (alpha * dt) / (char_len * char_len)
 
 
-def biot_coef():
-    pass
+def biot_coef(h_c:float, char_len:float, k:float) -> float:
+    """Dimensionless Biot coefficient (h-Lc / k) [-].
+
+    Units h_c-Lc / k
+        = m-(W/m2-K) / (W/m-K)
+        = W/m-K / W/m-K
+        = - / -
+
+    Args:
+        h_c: Convective coefficient [W/m2-K]
+        char_len: Characteristic length [m]
+        k: Conductivity [W/m-K]
+
+    Returns Biot coefficient.
+    """
+    assert h_c >- 1e-10  # not adiabatic
+    assert char_len >= 1e-10  # must have thickness
+    assert k >= 1e-10  # must have Conductivity
+
+    return (h_c * char_len) / k
 

@@ -5,6 +5,18 @@ import numpy as np
 import material as mat
 
 
+def test_diffusivity():
+    """Test derivation of thermal diffusivity."""
+
+    rho = 1 # kg/m3
+    Cp = 1 # specific heat J/kg-K
+    k = 0.1 # W/m-K
+    # alpha: k / p C
+    alpha = mat.diffusivity_coef(k, Cp, rho)
+    alpha_ = k / (rho * Cp)
+    assert np.abs(alpha - alpha_) < 1e-10
+
+
 def test_biot_coef():
     """Test derivation of biot coefficient."""
 
@@ -20,18 +32,6 @@ def test_biot_coef():
     assert np.abs(biot - biot_) < 1e-10
 
 
-def test_diffusivity():
-    """Test derivation of thermal diffusivity."""
-
-    rho = 1 # kg/m3
-    Cp = 1 # specific heat J/kg-K
-    k = 0.1 # W/m-K
-    # alpha: k / p C
-    alpha = mat.diffusivity_coef(k, Cp, rho)
-    alpha_ = k / (rho * Cp)
-    assert np.abs(alpha - alpha_) < 1e-10
-
-
 def test_fourier_coef():
     """Test Fourier (time constant) coefficient."""
 
@@ -43,7 +43,7 @@ def test_fourier_coef():
     dt = 0.1 # s
     # Fourier: alpha t / L2 = kt/L2pC
     fo = mat.fourier_coef(alpha, char_len, dt)
-    fo_ = (alpha * dt) / (L * L)
+    fo_ = (alpha * dt) / (char_len * char_len)
     assert np.abs(fo - fo_) < 1e-10
 
 
