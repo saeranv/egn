@@ -128,9 +128,12 @@ def main(
     ):
     """Temperatures for lumped node given parameters.
     """
-    char_len = vol / area
+    # Derive dimensionless params
+    char_len = vol / area  # [m]
     bi = mat.biot_coef(h_c, char_len, k)
     alpha = mat.diffusivity_coef(k, rho, C_p)
     fo = mat.fourier_coef(alpha, char_len, dt)
+
+    #
     theta = transient_lumped(bi, fo)
     return theta
