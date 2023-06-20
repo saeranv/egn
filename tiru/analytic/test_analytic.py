@@ -5,6 +5,15 @@ import numpy as np
 import material as mat
 import heat as heat
 
+# TODO
+# obj: get infra for optimization working w/ lumped node
+# - bd opt method (final)
+# - find Cengel example
+# - create test material
+# - material class
+# - test time_vec
+# - bd plot / vim.sh
+
 def test_diffusivity():
     """Test derivation of thermal diffusivity."""
 
