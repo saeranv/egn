@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
     """Diffusivity coefficient alpha = k / rho-C [m2/s].
 
