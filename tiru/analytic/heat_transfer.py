@@ -8,11 +8,16 @@ def ref_lumped_node():
     """Lumped node derivation."""
 
     return """
+
+    ## LUMPED NODE ASSUMPTIONS
     Assumes node is spatially isothermal (Bi < 0.1), and ambient temperature
     is a constant uniform temperature. Thus no meaningful temperature gradient
     within node, and entire node decays exponentially to ambient temp,
     according to,
         T(t) = (T0 - T_ext) exp(b t) + T_ext.
+
+    ## DERIVATION OF EQN
+    ## $$T(t) = (T(0) - T_ext) exp[(ha/VpC t]$$
 
     Derivation follows from an energy balance for the lumped node,
     Eqn 1.
@@ -27,16 +32,9 @@ def ref_lumped_node():
         (T(t) - T_ext) = (T(0) - T_ext) exp(b t),
     ;resulting in original eqn:
         T(t) = (T(0) - T_ext) exp(b t) + T_ext.
-    """
 
-
-def encode(
-    h_c, A,      # surface params
-    Cp, Vol, p,  # mass params
-    T0, T_ext,   # initial and external temps
-    tn, dt=1.0   # time params
-    ) -> np.ndarray:
-    """Predict array of temperatures for lumped node given parameters.
+    ## DERIVATION OF DIMENSIONLESS EQN
+    ## $$theta(tau) = exp(Bi tau)$$
 
     Simplify to 4 dimensionless params:
     theta, tau, Bi, so we can rewrite
@@ -55,6 +53,17 @@ def encode(
     Eqn 3.
     Bi tau = hLc/k kt/L2pC = h/LpC t
            = (hA/VpC) t; since A/V = L
+
+    """
+
+
+def encode(
+    h_c, A,      # surface params
+    Cp, Vol, p,  # mass params
+    T0, T_ext,   # initial and external temps
+    tn, dt=1.0   # time params
+    ) -> np.ndarray:
+    """Predict array of temperatures for lumped node given parameters.
 
     Args:
         # Diffusivity (alpha) params: hA/pCV
