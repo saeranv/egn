@@ -56,63 +56,6 @@ def ref_lumped_node():
 
     """
 
-
-def encode(
-    h_c, A,      # surface params
-    Cp, Vol, p,  # mass params
-    T0, T_ext,   # initial and external temps
-    tn, dt=1.0   # time params
-    ) -> np.ndarray:
-    """Predict array of temperatures for lumped node given parameters.
-
-    Args:
-        # Diffusivity (alpha) params: hA/pCV
-        h_c: Node surface convective coefficient [W/m2-K]
-        A: Node surface area [m2]
-        p: Node density in [kg/m3]
-        Cp: Node specific heat capacity [J/kg-K]
-        Vol: Node volume [m3]
-
-        # Initial temperatures
-        T_int: Node temperature [C]
-        T_ext: Ambient temperature [C]
-
-        # Time params
-        tn: time at step n (final time) [s]
-        dt: (optional) time step [s]
-
-    Returns (tot_t/dt) array of temperatures.
-    """
-    eps = 1e-10
-    assert T0 > -273.15; assert T_ext > -273.15
-    assert h_c >= eps; assert A >= eps
-    assert Cp >= eps; assert Vol >= eps; assert p >= eps
-    assert isinstance(tn, int);  assert tn >= eps; assert dt > eps
-
-    # Convert to K
-    T0 += 273.15; T_ext += 273.15 # K
-
-
-    # Time params
-    Nt = int(tn / dt)  # number of timesteps
-    t_vec = np.linspace(0, tn, Nt).astype(int)
-    tau_vec = np.zeros(Nt).astype(np.float64)
-    # TODO: delete
-    assert t_vec.size == tau_vec.size
-
-    # Intermediate params
-    _Lc = A / Vol  # characteristic lenght [m]
-    _Lc2 = _Lc * _Lc
-    _k = 1  # _k of node cancels out (see eqn 3), so just make 1
-    _a = _k / p * Cp  # diffusivity k/pC
-
-    # Main dimensionless params theta, tau, Bi
-    Bi = (h_c * _Lc) / _k  # Bi = h Lc / k
-    tau = (_a * t) / _Lc2  # tau = a t / Lc2
-
-    return Bi, tau
-
-
 def transient_lumped(bi:float, fo:float):
     """Dimensionless transient lumped node eqn.
 
@@ -135,14 +78,44 @@ def main(
     T0, T_ext,   # initial and external temps
     tn, dt=1.0   # time params
     ):
-    """Temperatures for lumped node given parameters.
+    """Predict array of temperatures for lumped node given parameters.
+
+    Args:
+        # Diffusivity (alpha) params: hA/pCV
+        h_c: Node surface convective coefficient [W/m2-K]
+        A: Node surface area [m2]
+        p: Node density in [kg/m3]
+        Cp: Node specific heat capacity [J/kg-K]
+        Vol: Node volume [m3]
+
+        # Initial temperatures
+        T_int: Node temperature [C]
+        T_ext: Ambient temperature [C]
+
+        # Time params
+        t: time at n
+
+    Returns (tot_t/dt) array of temperatures.
     """
+    eps = 1e-10
+    assert T0 > -273.15; assert T_ext > -273.15
+    assert h_c >= eps; assert area >= eps
+    assert C_p >= eps; assert vol >= eps; assert p >= eps
+    assert isinstance(tn, int);  assert tn >= eps; assert dt > eps
+
     # Derive dimensionless params
     char_len = vol / area  # [m]
     bi = mat.biot_coef(h_c, char_len, k)
     alpha = mat.diffusivity_coef(k, rho, C_p)
     fo = mat.fourier_coef(alpha, char_len, dt)
 
-    #
+    # Convert to K, and then dimensionless theta
+    T0 += 273.15; T_ext += 273.15 # K
+    # theta(t) = T(t) / delta_T: dimensionless temp
+    delta_T = np.abs(T0 - T_ext)
+
     theta = transient_lumped(bi, fo)
-    return theta
+    temps = theta * delta_T
+    return temps
+
+
