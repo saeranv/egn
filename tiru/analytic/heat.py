@@ -5,9 +5,7 @@ import material as mat
 
 
 def ref_lumped_node():
-    """Lumped node derivation."""
-
-    return """
+    """
     ## USAGE:
     ```python
     # Define dimensionless params
@@ -105,6 +103,8 @@ def ref_lumped_node():
     .. math::
         theta(t) = exp(Bi Fo) = exp(hA/VpC t)
     """
+    pass
+
 
 def lumped_node(bi:float, fo:float):
     """Dimensionless transient lumped node eqn.
