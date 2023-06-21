@@ -65,3 +65,50 @@ def biot_coef(h_c:float, char_len:float, k:float) -> float:
 
     return (h_c * char_len) / k
 
+def tau(delta_time, t):
+    """Time scale tau, dimensionless time from Holford.
+    """
+    return t / delta_time
+
+
+def time_scale_nu(tau, Fo):
+    """Time scale 2-nu^2, ratio of mass diffusion to forcing time scale.
+
+    nu = Lc / Sigma
+    Sigma = sqrt(2-alpha / w)  # effective penetration depth where temp varies
+    """
+
+    two_nu_sq = tau / Fo  # 2n^2
+    return np.sqrt(two_nu_sq / 2.0)
+
+
+def time_scale_chi(tau, Fo, Bi):
+    """Time scale chi - ratio of convection to forcing time scale.
+
+    Indicates whether there is time for significant heat to be transferred
+    to thermal mass before environmental temperature changes (forcing).
+    """
+
+    return tau / Fo-Bi
+
+
+def time_scale_Rn(area_vent, beta, neutral_height, delta_temp):
+    """Time scale Rn, ratio of forcing to ventilation flushing time."""
+
+    G = 9.81  # gravity
+    Rn = area_vent * np.sqrt(beta * G * neutral_height * delta_temp)
+    return Rn
+
+def time_scale_epsilon(vol_z, rho_z, c_pz, area_m, char_len_m, rho_m, c_m):
+    """Time scale epsilon, Cp of interior air to Cp of thermal mass.
+
+    rho = density [kg/m3]
+    C_p = specific heat capacity at constant pressure [J/kg-K]
+    V_z-rho_z-C_z / V_m-rho_m-C_m
+    = kg_z-C_z / kg_m-C_m = K / K
+
+    """
+    return (vol_z, rho_z, c_pz) / (area_m * char_len_m * rho_m * c_m)
+
+
+
