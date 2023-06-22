@@ -1,7 +1,8 @@
 #!bin/bash
 
 # "rY
-cmd="ls ."
-tmux send-keys -t x.2 "ls . 2>&1 vimp" ENTER
-cat < vimp
+cmd="python -m tiru.scratch"
+cmd2="$cmd &> ./tiru/vimp"
+tmux send-keys -t x.2 "$cmd2"  ENTER
+cat < ./vimp
 
