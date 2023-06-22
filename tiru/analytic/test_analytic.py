@@ -101,3 +101,9 @@ def test_lumped_node():
     assert T_int[1] < T0
     assert abs(np.min(T_int) - T_int[-1]) <= 1e-10
 
+
+    def test_chi_param():
+        """Test chi param."""
+
+        pass
+

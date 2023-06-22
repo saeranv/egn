@@ -81,7 +81,7 @@ def time_scale_nu(tau, Fo):
     two_nu_sq = tau / Fo  # 2n^2
     return np.sqrt(two_nu_sq / 2.0)
 
-
+two_nu_sq
 def time_scale_chi(tau, Fo, Bi):
     """Time scale chi - ratio of convection to forcing time scale.
 
@@ -109,6 +109,12 @@ def time_scale_epsilon(vol_z, rho_z, c_pz, area_m, char_len_m, rho_m, c_m):
 
     """
     return (vol_z, rho_z, c_pz) / (area_m * char_len_m * rho_m * c_m)
+
+
+def main():
+
+    # theta_z - theta_ext
+    epl
 
 
 
