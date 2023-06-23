@@ -36,7 +36,8 @@ else
     fn_text
 fi 
 
-[[ -f $TEMP ]] && rm $TEMP
+# don't delete, may be cause of crashing
+# [[ -f $TEMP ]] && rm $TEMP
 
 
 # if [[ $1 == "-img" ]]; then
