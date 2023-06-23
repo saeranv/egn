@@ -4,6 +4,9 @@ from io import BytesIO
 import numpy as np
 import matplotlib.pyplot as plt
 
+def null(*args, **kwargs):
+    """To nullify print output."""
+    return None
 
 def stream_plt(fig) -> None:
     """Stream bytes from fig to stdout."""
