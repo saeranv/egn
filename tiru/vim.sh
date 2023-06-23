@@ -6,21 +6,30 @@ FPATH="./scratch.py"
 TEMP="./temp.py"
 
 fn_image () {
-    cmd1="cp $FPATH $TEMP"
-    cmd2="sed -i 's/print(/vlt.null(/' $TEMP" 
-    cmd3="python $TEMP | tiru -img -"
-    cmd="$cmd1 && $cmd2 && $cmd3"
-    
-    tmux send-keys -t x.2 "$cmd &> /dev/null" ENTER 
+    cat $FPATH | grep -q "print("
+    if [[ $? -eq 0 ]]; then
+        cmd1="cp $FPATH $TEMP"
+        cmd2="sed -i 's/print(/vlt.null(/' $TEMP" 
+        cmd3="python $TEMP | tiru -img -"
+        cmd="$cmd1 && $cmd2 && $cmd3"
+    else
+        cmd="python $FPATH | tiru -img -"
+    fi
+    # tmux send-keys -t x.2 "$cmd &> /dev/null" ENTER 
+    tmux send-keys -t x.2 "$cmd" ENTER 
 }
 
 fn_text () {
-    # remove vlt.streamplt, then execute
-    cmd1="cp $FPATH $TEMP"
-    cmd2="sed -i 's/vlt.stream_plt(/vlt.null(/' $TEMP" 
-    cmd3="python $TEMP"
-    cmd="$cmd1 && $cmd2 && $cmd3"
-    
+    cat $FPATH | grep -q "vlt.stream_plt("
+    if [[ $? -eq 0 ]]; then
+        # remove vlt.stream_plt, then execute
+        cmd1="cp $FPATH $TEMP"
+        cmd2="sed -i 's/vlt.stream_plt(/vlt.null(/' $TEMP" 
+        cmd3="python $TEMP"
+        cmd="$cmd1 && $cmd2 && $cmd3"
+    else 
+        cmd="python $FPATH"
+    fi
     tmux send-keys -t x.2 "$cmd &> ./vimp" ENTER
     cat < ./vimp
 }
@@ -28,13 +37,15 @@ fn_text () {
 
 cat $FPATH | grep -q "vlt.stream_plt"
 # 0 means vlt.streamplt exists
-tmux send-keys -t x.2 "clear" ENTER
+tmux send-keys -t x.2 C-c
 if [[ $? == 0 ]]; then
     fn_image &> /dev/null
+    tmux send-keys -t x.2 C-c
     fn_text
-else 
+ else 
     fn_text
 fi 
+tmux send-keys -t x.2 C-c
 
 # don't delete, may be cause of crashing
 # [[ -f $TEMP ]] && rm $TEMP

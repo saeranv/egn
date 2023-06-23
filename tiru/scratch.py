@@ -1,10 +1,11 @@
 import numpy as np
-
+import viz.plt as vlt
 
 def fact(n1,n0):
-    return np.prod(np.arange(n0, n1+1, dtype=np.float64))
+    vals = np.arange(n0, n1).astype(np.float64)
+    # print(vals, vals.size)
+    return np.prod(vals)
 
+p = fact(365, 365-23) / (365.0 ** 23)
 
-p = fact(365,365-23) / (365 ** 23)
-
-print(1 - p)
+print(p)
