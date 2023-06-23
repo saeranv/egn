@@ -14,7 +14,8 @@ def stream_plt(fig) -> None:
     stdout.flush()
 
 
-def subplots(row=1, col=1, dimx=10, dimy=7):
-    fig, ax = plt.subplots(row, col, figsize=(dimx, dimy))
+def subplots(nrows=1, ncols=1, dimx=10, dimy=7, **kwargs) -> tuple:
+    fig, ax = plt.subplots(
+        nrows=nrows, ncols=ncols, figsize=(dimx, dimy), **kwargs)
     ax = np.array([ax]) if not isinstance(ax, np.ndarray) else ax
     return fig, ax
