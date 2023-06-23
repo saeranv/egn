@@ -4,6 +4,6 @@ import viz.plt as vlt
 
 
 f, ax = vlt.subplots()
-ax[0].scatter(np.random.rand(100), np.random.rand(100))
+ax[0].scatter(np.random.rand(100), np.random.rand(100),c='r')
 vlt.stream_plt(f)
 print('a')
