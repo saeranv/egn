@@ -37,13 +37,16 @@ fn_text () {
 }
 
 
-cat $FPATH | grep -q "vlt.stream_plt"
-# 0 means vlt.streamplt exists
 tmux send-keys -Rt bottom C-c
-if [[ $? == 0 ]]; then
-    fn_image &> /dev/null
-    fn_text
- else 
-    fn_text
-fi 
-tmux send-keys -Rt bottom C-c
+fn_image &> /dev/null
+fn_text
+# cat $FPATH | grep -q "vlt.stream_plt"
+# # 0 means vlt.streamplt exists
+# tmux send-keys -Rt bottom C-c
+# if [[ $? == 0 ]]; then
+#     fn_image &> /dev/null
+#     fn_text
+# else 
+#     fn_text
+# fi 
+# tmux send-keys -Rt bottom C-c
