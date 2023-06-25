@@ -1,4 +1,21 @@
 import numpy as np
+from dataclasses import dataclass
+
+@dataclass
+class Material:
+    """Attributes for material properties."""
+
+    # pVC/hA     # [s] time constant (beta)
+    hc: float    # [W/m2-K] convective coefficient
+    area: float  # [m2] surface area
+    vol: float   # [m3] volume
+    rho: float   # [kg/m3] density
+    cp: float    # [J/kg-K] specific heat capacity
+                 # at constant pressure
+    # diffusivity: k / pC
+    k: float     # [W/m-K] thermal conductivity
+
+
 
 
 def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
