@@ -4,8 +4,9 @@ import numpy as np
 import material as mat
 
 
-def ref_lumped_node():
-    """
+def ref():
+    """Usage and reference.
+
     ## USAGE:
     ```python
     # Define dimensionless params

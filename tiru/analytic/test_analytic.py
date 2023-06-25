@@ -6,8 +6,8 @@ import material as mat
 import heat as heat
 
 # TODO
-# obj: get infra for optimization working w/ lumped node
-# - bd opt method (final)
+# obj: get infrastructure for optimization
+# working w/ lumped node
 # - find Cengel example
 # - create test material
 # - material class
