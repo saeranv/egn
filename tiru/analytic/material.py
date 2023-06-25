@@ -1,7 +1,6 @@
 import numpy as np
-from dataclasses import dataclass
+# from dataclasses import dataclass
 
-@dataclass
 class Material:
     """Attributes for material properties.
 
@@ -29,20 +28,37 @@ class Material:
     Biot number represents ratio of convection at surface to
     conduction within body
     """
+    # zero tolerance epsilon
+    EPS = 1e-10
 
-    # Geometry
-    area: float  # [m2] surface area
-    vol: float   # [m3] volume
+    def __init__(self, area, vol, hc, k, rho, cp):
 
-    # Surface heat transfer params
-    hc: float    # [W/m2-K] convective coefficient
+        # Geometry
+        # [m2] surface area
+        self._area: float = area
+        vol: float   # [m3] volume
 
-    # Body heat transfer params
-    k: float     # [W/m-K] thermal conductivity
-    rho: float   # [kg/m3] density
-    cp: float    # [J/kg-K] specific heat capacity
-                 # at constant pressure
+        # Surface heat transfer params
+        hc: float    # [W/m2-K] convective coefficient
 
+        # Body heat transfer params
+        k: float     # [W/m-K] thermal conductivity
+        rho: float   # [kg/m3] density
+        cp: float    # [J/kg-K] specific heat capacity
+                     # at constant pressure
+
+        @property
+        def area(self):
+            return self._area
+
+        @area.setter
+        def area(self, v):
+            assert v > self.EPS
+            self._area = v
+
+        # assert k >= 1e-10    # not adiabatic
+        # assert rho >= 1e-10  # must have density
+        # assert C_p >= 1e-10  # must have heat capacity
 
 
 def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
@@ -59,10 +75,6 @@ def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
 
     Returns diffusivity coefficient [m2/s].
     """
-    assert k >= 1e-10    # not adiabatic
-    assert rho >= 1e-10  # must have density
-    assert C_p >= 1e-10  # must have heat capacity
-
     return k / (rho * C_p)
 
 

@@ -19,7 +19,35 @@ import heat as heat
 def test_material():
     """Test material class."""
 
-    mat.Material
+    # From ex 4-1, Cengel and Ghajar, pg.242
+    # Gas stream measured by thermocouple, with junction approx
+    # 0.5 mm radius sphere. How long until thermocouple reaches
+    # 99% of initial temp diff?
+
+    # Given:
+    # radius = 0.0005 # m
+    # k = 35 # W/m-K
+    # rho = 8500 # kg/m3
+    # cp = 230 # J/kg-K
+    # hc = 210 # W/m2-K
+
+    r = 0.0005 # m
+    sph = mat.Material(
+        area = 4.0 * np.pi * (r * r), # m2
+        vol = (4.0 / 3.0) * np.pi * (r * r * r), # m3
+        hc = 210, # W/m2-K
+        k = 35, # W/m-K
+        rho = 8500, # kg/m3
+        cp = 230 # J/kg-K
+    )
+
+    # Calculate time to reach 99% of initial temp diff
+    # via lumped node model with uniform temp
+    # dT[t] = Te - T[t]
+    # dT[t] = dT[0] exp[ -beta * t ] = 0.99
+
+    char_len = sph.vol / sph.area
+
 
 
 def test_diffusivity():
