@@ -3,18 +3,45 @@ from dataclasses import dataclass
 
 @dataclass
 class Material:
-    """Attributes for material properties."""
+    """Attributes for material properties.
 
-    # pVC/hA     # [s] time constant (beta)
-    hc: float    # [W/m2-K] convective coefficient
+    Args:
+        area: float  # [m2] surface area
+        vol: float   # [m3] volume
+
+        # Surface heat transfer params
+        hc: float    # [W/m2-K] convective coefficient
+
+        # Body heat transfer params
+        k: float     # [W/m-K] thermal conductivity
+        rho: float   # [kg/m3] density
+        cp: float    # [J/kg-K] specific heat capacity
+                     # at constant pressure
+
+    These combine to form:
+        pVC / hA            [s] beta (time constant)
+        k / pC              [m2/s] alpha (diffusivity)
+        h-Lc / k = h / U    [-] Bi (Biot number)
+        alpha-t / L2        [-] Fo (fourier number)
+
+    (T[t] - Te) = (T[0] - Te) exp[Bi Fo(t)] = beta t
+
+    Biot number represents ratio of convection at surface to
+    conduction within body
+    """
+
+    # Geometry
     area: float  # [m2] surface area
     vol: float   # [m3] volume
+
+    # Surface heat transfer params
+    hc: float    # [W/m2-K] convective coefficient
+
+    # Body heat transfer params
+    k: float     # [W/m-K] thermal conductivity
     rho: float   # [kg/m3] density
     cp: float    # [J/kg-K] specific heat capacity
                  # at constant pressure
-    # diffusivity: k / pC
-    k: float     # [W/m-K] thermal conductivity
-
 
 
 

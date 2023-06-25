@@ -14,6 +14,14 @@ import heat as heat
 # - test time_vec
 # - bd plot / vim.sh
 
+
+
+def test_material():
+    """Test material class."""
+
+    mat.Material
+
+
 def test_diffusivity():
     """Test derivation of thermal diffusivity."""
 
