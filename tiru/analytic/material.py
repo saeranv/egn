@@ -48,7 +48,7 @@ class Material:
     @area.setter
     def area(self, area):
         assert area >= self._EPS, f"Area must be positive, got {area}."
-        self._area = area
+        self._area = float(area)
 
     @property
     def vol(self):
@@ -58,7 +58,7 @@ class Material:
     @vol.setter
     def vol(self, vol):
         assert vol >= self._EPS, f"Volume must be positive, got {vol}."
-        self._vol = vol
+        self._vol = float(vol)
 
     @property
     def hc(self):
@@ -68,7 +68,7 @@ class Material:
     @hc.setter
     def hc(self, hc):
         assert hc >= self._EPS, "Convectivity can't be adiabatic, got hc {hc}."
-        self._hc = hc
+        self._hc = float(hc)
 
     @property
     def k(self):
@@ -78,7 +78,7 @@ class Material:
     @k.setter
     def k(self, k):
         assert k >= self._EPS, f"Conductivity can't be adiabatic, got {k}."
-        self._k = k
+        self._k = float(k)
 
     @property
     def rho(self):
@@ -88,7 +88,7 @@ class Material:
     @rho.setter
     def rho(self, rho):
         assert rho >= self._EPS, f"Density must be positive, got {rho}."
-        self._rho = rho
+        self._rho = float(rho)
 
     @property
     def cp(self):
@@ -98,7 +98,7 @@ class Material:
     @cp.setter
     def cp(self, cp):
         assert cp >= self._EPS, "Heat capacity must be positive, got {cp}."
-        self._cp = cp
+        self._cp = float(cp)
 
 
 def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
