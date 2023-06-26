@@ -5,7 +5,6 @@ import numpy as np
 import material as mat
 import heat as heat
 
-np.random
 
 # TODO
 # obj: get infrastructure for optimization
@@ -42,8 +41,9 @@ def test_material():
 
     # Calculate time to reach 99% of initial temp diff
     # via lumped node model with uniform temp
-    # dT[t] = Te - T[t]
-    # dT[t] = dT[0] exp[ -beta * t ] = 0.99
+    # dT[t] = dT[0] exp[-beta t], dT[t] = Te - T[t]
+    # dT[t] / dT[0] = 0.99, since dT[0] is initial temp diff
+    # 0.99 = exp[-beta t]
 
     char_len = sph.vol / sph.area
 
