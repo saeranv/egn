@@ -8,9 +8,9 @@ import heat as heat
 # TODO
 # obj: get infrastructure for optimization
 # working w/ lumped node
-# - find Cengel example
+# X- find Cengel example
 # - create test material
-# - material class
+# X- material class
 # - test time_vec
 # - bd plot / vim.sh
 

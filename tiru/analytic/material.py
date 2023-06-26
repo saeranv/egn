@@ -1,6 +1,7 @@
 import numpy as np
-# from dataclasses import dataclass
+from dataclasses import dataclass
 
+@dataclass
 class Material:
     """Attributes for material properties.
 
@@ -28,37 +29,34 @@ class Material:
     Biot number represents ratio of convection at surface to
     conduction within body
     """
-    # zero tolerance epsilon
-    EPS = 1e-10
+    # Constants
+    _EPS = 1e-10  # [-] zero tolerance epsilon
 
-    def __init__(self, area, vol, hc, k, rho, cp):
+    # Geometry
+    _area: float  # [m2] surface area
+    _vol: float   # [m3] volume
 
-        # Geometry
-        # [m2] surface area
-        self._area: float = area
-        vol: float   # [m3] volume
+    # Surface heat transfer params
+    _hc: float    # [W/m2-K] convective coefficient
 
-        # Surface heat transfer params
-        hc: float    # [W/m2-K] convective coefficient
+    # Body heat transfer params
+    _k: float     # [W/m-K] thermal conductivity
+    _rho: float   # [kg/m3] density
+    _cp: float    # [J/kg-K] specific heat capacity
+                 # at constant pressure
 
-        # Body heat transfer params
-        k: float     # [W/m-K] thermal conductivity
-        rho: float   # [kg/m3] density
-        cp: float    # [J/kg-K] specific heat capacity
-                     # at constant pressure
+    @property
+    def area(self):
+        return self._area
 
-        @property
-        def area(self):
-            return self._area
+    @area.setter
+    def area(self, v):
+        assert v > self._EPS
+        self._area = v
 
-        @area.setter
-        def area(self, v):
-            assert v > self.EPS
-            self._area = v
-
-        # assert k >= 1e-10    # not adiabatic
-        # assert rho >= 1e-10  # must have density
-        # assert C_p >= 1e-10  # must have heat capacity
+    # assert k >= 1e-10    # not adiabatic
+    # assert rho >= 1e-10  # must have density
+    # assert C_p >= 1e-10  # must have heat capacity
 
 
 def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
