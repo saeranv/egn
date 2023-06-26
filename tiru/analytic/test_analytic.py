@@ -5,6 +5,8 @@ import numpy as np
 import material as mat
 import heat as heat
 
+np.random
+
 # TODO
 # obj: get infrastructure for optimization
 # working w/ lumped node
@@ -13,9 +15,6 @@ import heat as heat
 # X- material class
 # - test time_vec
 # - bd plot / vim.sh
-
-
-
 def test_material():
     """Test material class."""
 
