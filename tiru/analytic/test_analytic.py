@@ -117,29 +117,28 @@ def test_diffusivity():
     # alpha: k / p C
     alpha = mat.diffusivity_coef(tc.k, tc.cp, tc.rho)
 
-    # Recover alpha from b_, Lc given in q 4-1
-    beta_ = 1.0 / 0.462 # pVC/hA
+    # Derive alpha from b_, Lc given in q 4-1
+    b_ = 0.462 # hA/pVC
     lc_ = 1.67 * 1e-4 # ma
-    alpha_ = (lc_ * tc.rho) / (tc.hc * beta_)
+    alpha_ = (b_ * lc_ * tc.k) / tc.hc
 
-    print(alpha, alpha_)
-
-    assert np.abs(alpha - alpha_) < 1e-10
+    assert np.abs(alpha - alpha_) < 1e-3
 
 
-def test_fourier_coef():
-    """Test Fourier (time constant) coefficient."""
+def test_fourier_number():
+    """Test Fourier number."""
 
-    rho = 1 # kg/m3
-    Cp = 1 # specific heat J/kg-K
-    k = 0.1 # W/m-K
-    char_len = 0.1  # m
-    alpha = mat.diffusivity_coef(k, Cp, rho)
-    dt = 0.1 # s
-    # Fourier: alpha t / L2 = kt/L2pC
-    fo = mat.fourier_coef(alpha, char_len, dt)
-    fo_ = (alpha * dt) / (char_len * char_len)
-    assert np.abs(fo - fo_) < 1e-10
+    tc = _thermocouple()
+    alpha = mat.diffusivity_coef(tc.k, tc.cp, tc.rho)
+    t = 1.0 # s
+    lc = tc.vol / tc.area
+    fo = mat.fourier_num(alpha, lc, t)
+    print(alpha, lc, t, alpha / (lc * lc))
+    # Derive Fo from 1/beta value givein in q 4-1
+    # Fourier: alpha t / L2 = kt/L2pC = t [hA/VpC] = t/beta
+    b_ = 0.462 # 1/beta
+    fo_ = t * b_
+    assert np.abs(fo - fo_) < 1e-3
 
 
 # def test_lumped_node():

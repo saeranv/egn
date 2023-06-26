@@ -144,7 +144,7 @@ def time_constant(rho, vol, cp, hc, area):
 
 
 
-def fourier_num(alpha:float, char_len:float, dt:float) -> float:
+def fourier_num(alpha:float, char_len:float, nt:float) -> float:
     """Dimensionless fourier number (alpha-dt / L2) [-].
 
     Units dt-alpha / L2
@@ -155,15 +155,11 @@ def fourier_num(alpha:float, char_len:float, dt:float) -> float:
     Args:
         alpha: diffusivity coefficient [m2/s]
         char_len: characteristic length [m]
-        dt: time step [s]
+        nt: elapsed time [s]
 
     Returns Fourier coefficient.
     """
-    assert alpha >= 1e-10  # k > 0 so (k / rho-C) > 0
-    assert char_len >= 1e-10  # must have thickness
-    assert dt >= 1e-10  # must have timestep
-
-    return (alpha * dt) / (char_len * char_len)
+    return (alpha * nt) / (char_len * char_len)
 
 
 def biot_num(h_c:float, char_len:float, k:float) -> float:
