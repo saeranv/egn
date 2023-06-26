@@ -146,10 +146,10 @@ def test_thermocouple():
     # Test same problem w/ heat class
 
     # Initial temperatures
-    _temp_0 = 100.0
-    _temp_ext = 0.0
-    temp_0 = _temp_0 + 273.15 # K
-    temp_ext = _temp_ext + 273.15 # K
+    temp_0 = 100.0
+    temp_ext = 0.0
+    # temp_0 = _temp_0 + 273.15 # K
+    # temp_ext = _temp_ext + 273.15 # K
     t = np.arange(0, 11) # 0-10 seconds in 11 steps (time at T[t])
     alpha = mat.diffusivity_coef(tc.k, tc.rho, tc.cp)
     fo = mat.fourier_num(alpha, lc, t)
@@ -158,24 +158,22 @@ def test_thermocouple():
     # Convert temps to dimensionless theta
     # TODO: confirm if theta should input
     # Fo=alpha-t / Lc2, then alphaT/Lc2
-    # theta(fo) = (T[t]-Te) / (T[0]-Te) (alpha / Lc2)
-    #           = (T[t]-Te)-alpha / (T[0]-Te)-Lc2
-    # T[t] = [(theta * (T[0]-Te) * Lc2) / alpha] + Te
-    sc = ((temp_0 - temp_ext) * (lc * lc)) / alpha
 
     theta = heat.lumped_node(bi, fo)
-    print(theta.round(2))
     assert theta.shape == t.shape
     assert abs(theta[0] - 1.0) < 1e-10
     assert abs(theta[-1] - 0.0) < 1e-2
 
-    temp = ((theta * sc) - temp_ext) - 273.15
-
+    # theta(fo) = (T[t]-Te) / (T[0]-Te)
+    # theta * (T[0]-Te) = T[t] - Te
+    # T[t] = [theta * (T[0]-Te)] + Te
+    dT = (temp_0 - temp_ext)
+    temp = (theta * dT) + temp_ext
+    print(theta.round(2))
     print(temp.round(7))
-    assert temp[0] > _temp_ext
-    assert np.abs(temp[0] - _temp_0) < 1e-3
-    # assert temp[1] < temp_0
-    # assert abs(np.min(temp) - temp[-1]) <= 1e-10
+    assert abs(temp[0] -  temp_0) < 1e-3
+    assert abs(temp[-1] - temp_ext) < 1e-3
+
 
 
 
