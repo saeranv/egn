@@ -1,6 +1,7 @@
 import numpy as np
 from dataclasses import dataclass
 
+
 @dataclass
 class Material:
     """Attributes for material properties.
@@ -166,10 +167,10 @@ def time_scale_nu(tau, Fo):
     Sigma = sqrt(2-alpha / w)  # effective penetration depth where temp varies
     """
 
-    two_nu_sq = tau / Fo  # 2n^2
-    return np.sqrt(two_nu_sq / 2.0)
+    nu_ = tau / Fo  # 2n^2
+    return np.sqrt(nu_ / 2.0)  # nu
 
-two_nu_sq
+
 def time_scale_chi(tau, Fo, Bi):
     """Time scale chi - ratio of convection to forcing time scale.
 

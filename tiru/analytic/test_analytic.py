@@ -18,9 +18,11 @@ def test_material():
     """Test material class."""
 
     # Test tolerance error
-
-
-    sph = mat.Material(0, 1, 1, 1, 1, 1)
+    sph = mat.Material(1, 1, 1, 1, 1, 1)
+    sph.area = 1.0
+    sph.area = 0
+    with pytest.raises(AssertionError):
+        sph.area = 0.0
 
     # From ex 4-1, Cengel and Ghajar, pg.242
     # Gas stream measured by thermocouple, with junction approx
@@ -43,6 +45,7 @@ def test_material():
         _rho = 8500, # kg/m3
         _cp = 230 # J/kg-K
     )
+
 
     # Calculate time to reach 99% of initial temp diff
     #
