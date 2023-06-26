@@ -133,12 +133,14 @@ def test_fourier_number():
     t = 1.0 # s
     lc = tc.vol / tc.area
     fo = mat.fourier_num(alpha, lc, t)
-    print(alpha, lc, t, alpha / (lc * lc))
     # Derive Fo from 1/beta value givein in q 4-1
-    # Fourier: alpha t / L2 = kt/L2pC = t [hA/VpC] = t/beta
+    # t/beta = Fo Bi
+    # Fo = t/(beta Bi)
     b_ = 0.462 # 1/beta
-    fo_ = t * b_
-    assert np.abs(fo - fo_) < 1e-3
+    bi_ = 0.001 # biot
+    fo_ = (t * b_) / bi_
+    print(fo, fo_)
+    assert np.abs(fo - fo_) < 1.0
 
 
 # def test_lumped_node():
