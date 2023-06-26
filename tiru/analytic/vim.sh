@@ -1,1 +1,2 @@
-python -m pytest analytic/test_analytic.py::test_material
+
+python -m pytest ./test_analytic.py::test_material
