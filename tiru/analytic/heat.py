@@ -17,7 +17,7 @@ def lumped_node(bi:float, fo:float):
     Returns dimensionless temp, theta = (T - T_ext) / (T0 - T_ext) [-]
     """
     # T =  (theta * (T0 - T_ext)) + T_ext)
-    return np.exp(bi * fo)
+    return np.exp(-1 * bi * fo)
 
 
 def use():
