@@ -1,6 +1,12 @@
 import numpy as np
 from dataclasses import dataclass
 
+from typing import Union
+from numpy.typing import NDArray
+
+ndfloat = Union[NDArray[np.float64], float]
+
+
 
 @dataclass
 class Material:
@@ -144,7 +150,7 @@ def time_constant(rho, vol, cp, hc, area):
 
 
 
-def fourier_num(alpha:float, char_len:float, nt:float) -> float:
+def fourier_num(alpha:ndfloat, char_len:ndfloat, nt:ndfloat) -> ndfloat:
     """Dimensionless fourier number (alpha-dt / L2) [-].
 
     Units dt-alpha / L2

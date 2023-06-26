@@ -8,11 +8,7 @@ import heat as heat
 
 # TODO
 # obj: get infrastructure for optimization working w/ lumped node
-# X- find Cengel example
-# X- create test material
-# X- material class
-# - test time_vec
-# - bd plot / vim.sh
+
 
 def _thermocouple():
     """Test material from Cengel and Ghajar, pg.242.
@@ -130,10 +126,11 @@ def test_thermocouple():
     """
     tc = _thermocouple()
     lc = tc.vol / tc.area
+
+    # Test time to get to 1C manually
     # Check if Bi <= 0.1 to see if lumped node assumption valid.
     bi = (tc.hc * (tc.vol / tc.area)) / tc.k
     assert bi <= 0.1, bi
-
     # Test beta (time constant) pVC / hA
     beta = (tc.rho * tc.vol * tc.cp) / (tc.hc * tc.area)  # [s]
 
@@ -144,7 +141,6 @@ def test_thermocouple():
 
 
     # Test same problem w/ heat class
-
     # Initial temperatures
     temp_0 = 100.0
     temp_ext = 0.0
@@ -155,24 +151,22 @@ def test_thermocouple():
     fo = mat.fourier_num(alpha, lc, t)
     # so at 99%, T_int ~ 1C
 
-    # Convert temps to dimensionless theta
-    # TODO: confirm if theta should input
-    # Fo=alpha-t / Lc2, then alphaT/Lc2
-
+    # Get theta, imensionless temp
     theta = heat.lumped_node(bi, fo)
     assert theta.shape == t.shape
-    assert abs(theta[0] - 1.0) < 1e-10
-    assert abs(theta[-1] - 0.0) < 1e-2
+    assert np.abs(theta[0] - 1.0) < 1e-10
+    assert np.abs(theta[-1] - 0.0) < 1e-2
 
     # theta(fo) = (T[t]-Te) / (T[0]-Te)
     # theta * (T[0]-Te) = T[t] - Te
     # T[t] = [theta * (T[0]-Te)] + Te
     dT = (temp_0 - temp_ext)
     temp = (theta * dT) + temp_ext
-    print(theta.round(2))
-    print(temp.round(7))
+    # print(theta.round(2))
+    # print(temp.round(2))
     assert abs(temp[0] -  temp_0) < 1e-3
-    assert abs(temp[-1] - temp_ext) < 1e-3
+    # after 10s = 99% of temp diff achieved = T[10]=1C
+    assert abs(temp[10] - 1.0) < 1e-1
 
 
 

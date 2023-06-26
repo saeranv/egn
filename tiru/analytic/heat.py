@@ -1,10 +1,14 @@
 """Heat transfer equations."""
 
+
+from typing import Union
+from numpy.typing import NDArray
 import numpy as np
-import material as mat
+
+ndfloat = Union[NDArray[np.float64], float]
 
 
-def lumped_node(bi:float, fo:float):
+def lumped_node(bi:ndfloat, fo:ndfloat) -> ndfloat:
     """Dimensionless transient lumped node eqn.
 
     Solves for theta given Bi and tau,
