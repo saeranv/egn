@@ -148,9 +148,8 @@ def test_thermocouple():
     # Initial temperatures
     temp_0 = 100.0 + 273.15 # K
     temp_ext = 0.0 + 273.15 # K
-    t = np.arange(1, 10) # 0-10 seconds (time at T[t])
+    t = np.arange(0, 11) # 0-10 seconds in 11 steps (time at T[t])
     # so at 99%, T_int ~ 1C
-
 
     # Derive dimensionless params
     lc = tc.vol / tc.area  # [m]
@@ -160,19 +159,29 @@ def test_thermocouple():
     fo = mat.fourier_num(alpha, lc, t)
 
     # Convert temps to dimensionless theta
-    # theta(t) = T(t) / delta_T: dimensionless temp
-    delta_temp = temp_ext - temp[0]
+    # TODO: confirm if theta should input
+    # Fo=alpha-t / Lc2, then alphaT/Lc2
+    # theta(fo) = (T[t] - Te) / (T[0] - Te) (alpha / Lc2)
+    #           = (T[t] - Te)-alpha / delta_temp-Lc2
+    # T[t] = ((theta * delta_temp * Lc2/alpha) + Te) - 273.15
 
-    # T = theta * delta_T
+    sc = (temp_ext - temp_0) * ((lc * lc) / alpha)
     theta = heat.lumped_node(bi, fo)
-    temp = theta * delta_temp
+    print(theta.round(8))
+    assert theta.shape == t.shape
+    assert abs(theta[0] - 0.0) < 1e-5
+    assert abs(theta[-1] - 1.0) < 1e-5
 
-    assert isinstance(T_int, np.ndarray), type(T_int)
-    assert T_int.shape == t, T_int.shape
-    assert T0 > T_ext
-    assert T_int[0] == T0
-    assert T_int[1] < T0
-    assert abs(np.min(T_int) - T_int[-1]) <= 1e-10
+    temp = ((theta * sc) - temp_ext) - 273.15
+
+    print(temp.round(2))
+    print(temp[-2:].round(2))
+    assert isinstance(temp, np.ndarray), type(temp)
+    assert temp.shape == t.shape
+    assert temp_0 > temp_ext
+    assert np.abs(temp[0] - temp_0) < 1e-3
+    assert temp[1] < temp_0
+    assert abs(np.min(temp) - temp[-1]) <= 1e-10
 
 
 
