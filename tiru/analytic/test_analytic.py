@@ -10,7 +10,7 @@ import heat as heat
 # obj: get infrastructure for optimization
 # working w/ lumped node
 # X- find Cengel example
-# - create test material
+# X- create test material
 # X- material class
 # - test time_vec
 # - bd plot / vim.sh
@@ -39,34 +39,6 @@ def _thermocouple():
     return tc
 
 
-def test_thermocouple():
-    """Solve q 4-1 from Cengel and Ghajar, pg.242.
-
-    Given immersion of there in gas stream with temp Te, calculate time of
-    thermocouple to reach 99% of initial temp diff.
-
-    The time (t) equals:
-        t = -log(0.99) / beta
-
-    Derivation:
-        dT[t] = dT[0] exp[-beta t], dT[t] = Te - T[t]
-        dT[t] / dT[0] = (100%-99%) / 100%, since dT[0] is initial temp diff
-        log(0.01) = log(exp[-beta t]) = -beta t
-        t = -log(0.99) / beta
-    """
-    # Should check if Bi <= 0.1 to see if lumped node assumption valid.
-
-    # Calculate beta (time constant) pVC / hA
-    tc = _thermocouple()
-    beta = mat.time_constant(
-        tc.area, tc.vol, tc.hc, tc.rho, tc.cp)
-
-    t = -np.log(0.01) / beta
-    t_ = 10.0 # s
-    print(t)
-    assert np.abs(t - t_) < 1e-5
-
-
 def test_material():
     """Test material class."""
 
@@ -76,6 +48,50 @@ def test_material():
         mat_.area = 0.0
     with pytest.raises(AssertionError):
         mat_.hc = 1e-11
+
+
+def test_biot_coef():
+    """Test derivation of biot coefficient."""
+
+    tc = _thermocouple()
+    lc = tc.vol / tc.area
+    biot_ = mat.biot_coef(tc.hc, lc, tc.k)
+    biot = 0.001  # Bi = (h_c * L^2) / k
+    assert np.abs(biot - biot_) < 1e-10
+
+
+def test_thermocouple():
+    """Solve q 4-1 from Cengel and Ghajar, pg.242.
+
+    Given immersion of there in gas stream with temp Te, calculate time of
+    thermocouple to reach 99% of initial temp diff.
+
+    The time (t) equals:
+        t = -log(0.99) * beta
+
+    Derivation:
+        dT[t] = dT[0] exp[-t/beta t], where dT[t] = Te - T[t]
+        dT[t] / dT[0] = (100%-99%) / 100%, since dT[0] is initial temp diff
+        log(0.01) = log(exp[-t / beta]) = -t / beta
+        t = -log(0.99) / beta
+    """
+    tc = _thermocouple()
+
+    # Check if Bi <= 0.1 to see if lumped node assumption valid.
+    bi = mat.biot_num(tc.hc, tc.vol/tc.area, tc.k)
+    assert bi <= 0.1, bi
+
+    # Test beta (time constant) pVC / hA
+    beta = (tc.rho * tc.vol * tc.cp) / (tc.hc * tc.area)  # [s]
+    beta_ = mat.time_constant(
+        tc.rho, tc.vol, tc.cp, tc.hc, tc.area)
+    assert np.abs(beta - beta_) < 1e-5
+
+    # Test t (answer)
+    t = -1 * np.log(0.01) * beta
+    t_ = 10.0 # s
+    print(t)
+    assert np.abs(t - t_) < 1e-5
 
 
 def test_diffusivity():
@@ -88,21 +104,6 @@ def test_diffusivity():
     alpha = mat.diffusivity_coef(k, Cp, rho)
     alpha_ = k / (rho * Cp)
     assert np.abs(alpha - alpha_) < 1e-10
-
-
-def test_biot_coef():
-    """Test derivation of biot coefficient."""
-
-    h_c = 1 # W/m2-K
-    area = 1 # m2
-    vol = 1 # m3
-    L = vol / area  # m
-    k = 0.1 # W/m-K
-
-    # Bi = (h_c * L^2) / k
-    biot = mat.biot_coef(h_c, L, k)
-    biot_ = (h_c * L**2) / k
-    assert np.abs(biot - biot_) < 1e-10
 
 
 def test_fourier_coef():

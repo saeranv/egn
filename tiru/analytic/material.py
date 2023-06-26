@@ -144,8 +144,8 @@ def time_constant(rho, vol, cp, hc, area):
 
 
 
-def fourier_coef(alpha:float, char_len:float, dt:float) -> float:
-    """Dimensionless fourier coefficient (alpha-dt / L2) [-].
+def fourier_num(alpha:float, char_len:float, dt:float) -> float:
+    """Dimensionless fourier number (alpha-dt / L2) [-].
 
     Units dt-alpha / L2
         = s-alpha / m2
@@ -166,8 +166,8 @@ def fourier_coef(alpha:float, char_len:float, dt:float) -> float:
     return (alpha * dt) / (char_len * char_len)
 
 
-def biot_coef(h_c:float, char_len:float, k:float) -> float:
-    """Dimensionless Biot coefficient (h-Lc / k) [-].
+def biot_num(h_c:float, char_len:float, k:float) -> float:
+    """Dimensionless Biot number (h-Lc / k) [-].
 
     Biot number represents ratio of convection at surface to
     conduction within body:
