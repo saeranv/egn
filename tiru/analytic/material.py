@@ -1,11 +1,9 @@
-import numpy as np
 from dataclasses import dataclass
-
 from typing import Union
+import numpy as np
 from numpy.typing import NDArray
 
 ndfloat = Union[NDArray[np.float64], float]
-
 
 
 @dataclass
@@ -33,12 +31,14 @@ class Material:
     # Surface heat transfer params
     hc: ndfloat
     area: ndfloat
-
     # Body heat transfer params
     vol: ndfloat
     k: ndfloat
     rho: ndfloat
     cp: ndfloat
+    # Temp
+    theta: ndfloat
+    temp: ndfloat
 
 
 def diffusivity_coef(k:ndfloat, rho:ndfloat, c_p:ndfloat) -> ndfloat:
@@ -177,12 +177,5 @@ def time_scale_epsilon(vol_z, rho_z, c_pz, area_m, char_len_m, rho_m, c_m):
 
     """
     return (vol_z, rho_z, c_pz) / (area_m * char_len_m * rho_m * c_m)
-
-
-def main():
-
-    # theta_z - theta_ext
-    epl
-
 
 
