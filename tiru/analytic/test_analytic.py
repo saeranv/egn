@@ -107,19 +107,23 @@ def test_thermocouple():
     # Test t (answer)
     t = -1 * np.log(0.01) * beta
     t_ = 10 # s
-    print(t)
     assert np.abs(t - t_) < 1e-1
 
 
 def test_diffusivity():
     """Test derivation of thermal diffusivity."""
 
-    rho = 1 # kg/m3
-    Cp = 1 # specific heat J/kg-K
-    k = 0.1 # W/m-K
+    tc = _thermocouple()
     # alpha: k / p C
-    alpha = mat.diffusivity_coef(k, Cp, rho)
-    alpha_ = k / (rho * Cp)
+    alpha = mat.diffusivity_coef(tc.k, tc.cp, tc.rho)
+
+    # Recover alpha from b_, Lc given in q 4-1
+    beta_ = 1.0 / 0.462 # pVC/hA
+    lc_ = 1.67 * 1e-4 # ma
+    alpha_ = (lc_ * tc.rho) / (tc.hc * beta_)
+
+    print(alpha, alpha_)
+
     assert np.abs(alpha - alpha_) < 1e-10
 
 
