@@ -17,6 +17,11 @@ import heat as heat
 def test_material():
     """Test material class."""
 
+    # Test tolerance error
+
+
+    sph = mat.Material(0, 1, 1, 1, 1, 1)
+
     # From ex 4-1, Cengel and Ghajar, pg.242
     # Gas stream measured by thermocouple, with junction approx
     # 0.5 mm radius sphere. How long until thermocouple reaches
@@ -40,12 +45,15 @@ def test_material():
     )
 
     # Calculate time to reach 99% of initial temp diff
-    # via lumped node model with uniform temp
+    #
     # dT[t] = dT[0] exp[-beta t], dT[t] = Te - T[t]
-    # dT[t] / dT[0] = 0.99, since dT[0] is initial temp diff
-    # 0.99 = exp[-beta t]
+    # dT[t] / dT[0] = 0.99      , since dT[0] is initial temp diff
+    # log(0.99) = log(exp[-beta t]) = -beta t
+    # t = -log(0.99) / beta
+
 
     char_len = sph.vol / sph.area
+
 
 
 

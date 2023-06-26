@@ -15,8 +15,7 @@ class Material:
         # Body heat transfer params
         k: float     # [W/m-K] thermal conductivity
         rho: float   # [kg/m3] density
-        cp: float    # [J/kg-K] specific heat capacity
-                     # at constant pressure
+        cp: float    # [J/kg-K] specific heat capacity at constant pressure
 
     These combine to form:
         pVC / hA            [s] beta (time constant)
@@ -33,7 +32,7 @@ class Material:
     _EPS = 1e-10  # [-] zero tolerance epsilon
 
     # Geometry
-    _area: float  # [m2] surface area
+    _area: float
     _vol: float   # [m3] volume
 
     # Surface heat transfer params
@@ -47,12 +46,15 @@ class Material:
 
     @property
     def area(self):
+        """[m2] surface area"""
         return self._area
 
     @area.setter
     def area(self, v):
-        assert v > self._EPS
+        assert v >= self._EPS
         self._area = v
+
+
 
     # assert k >= 1e-10    # not adiabatic
     # assert rho >= 1e-10  # must have density
@@ -74,6 +76,36 @@ def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
     Returns diffusivity coefficient [m2/s].
     """
     return k / (rho * C_p)
+
+
+def time_constant(rho, vol, cp, hc, area):
+    """Time constant (beta) for lumped node = pVC / hA [s].
+
+    The reciprocal the time constant (beta) is the constant
+    in the exponential function representing a lumped node
+    system:
+        dT[t]/dT[0] = exp[t/beta].
+
+    Units rho-V-C / hc-A
+        = kg-(J/kg-K) / [W/K]
+        = J/K / J/K-s
+        = 1/s
+
+    Args:
+        area: float  # [m2] surface area
+        vol: float   # [m3] volume
+
+        # Surface heat transfer params
+        hc: float    # [W/m2-K] convective coefficient
+
+        # Body heat transfer params
+        rho: float   # [kg/m3] density
+        cp: float    # [J/kg-K] specific heat capacity at constant pressure
+
+    Returns time constant.
+    """
+    return (rho * vol * cp) / (hc * area)
+
 
 
 def fourier_coef(alpha:float, char_len:float, dt:float) -> float:
@@ -119,9 +151,11 @@ def biot_coef(h_c:float, char_len:float, k:float) -> float:
 
     return (h_c * char_len) / k
 
+
+
+
 def tau(delta_time, t):
-    """Time scale tau, dimensionless time from Holford.
-    """
+    """Time scale tau, dimensionless time from Holford."""
     return t / delta_time
 
 
