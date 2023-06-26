@@ -21,6 +21,9 @@ def lumped_node(bi:ndfloat, fo:ndfloat) -> ndfloat:
     Returns dimensionless temp, theta = (T - T_ext) / (T0 - T_ext) [-]
     """
     # T =  (theta * (T0 - T_ext)) + T_ext)
+    if bi <= 0.1:
+        print(f"Warning: Bi={bi} > 0.1, but Bi <= 0.1 for lumped node.")
+
     return np.exp(-1 * bi * fo)
 
 
