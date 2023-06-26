@@ -136,9 +136,9 @@ def test_fourier_number():
     # Derive Fo from 1/beta value givein in q 4-1
     # t/beta = Fo Bi
     # Fo = t/(beta Bi)
-    b_ = 0.462 # 1/beta
-    bi_ = 0.001 # biot
-    fo_ = (t * b_) / bi_
+    beta_ = 1.0/0.462 # given beta
+    bi_ = 0.001       # given biot
+    fo_ = t / (beta_ * bi_)
     print(fo, fo_)
     assert np.abs(fo - fo_) < 1.0
 
