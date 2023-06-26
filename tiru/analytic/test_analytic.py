@@ -14,29 +14,21 @@ import heat as heat
 # X- material class
 # - test time_vec
 # - bd plot / vim.sh
-def test_material():
-    """Test material class."""
-    mat.Material()
 
-    # Test tolerance error
-    sph = mat.Material(1, 1, 1, 1, 1, 1)
-    with pytest.raises(AssertionError):
-        sph.area = 0.0
+def _thermocouple():
+    """Test material from Cengel and Ghajar, pg.242.
 
-    # From ex 4-1, Cengel and Ghajar, pg.242
-    # Gas stream measured by thermocouple, with junction approx
-    # 0.5 mm radius sphere. How long until thermocouple reaches
-    # 99% of initial temp diff?
+    Represents thermocouple (temp sensor) junction as 0.5 mm radius there.
 
-    # Given:
-    # radius = 0.0005 # m
-    # k = 35 # W/m-K
-    # rho = 8500 # kg/m3
-    # cp = 230 # J/kg-K
-    # hc = 210 # W/m2-K
-
+    Given:
+        radius = 0.0005 # m
+        k = 35 # W/m-K
+        rho = 8500 # kg/m3
+        cp = 230 # J/kg-K
+        hc = 210 # W/m2-K
+    """
     r = 0.0005 # m
-    sph = mat.Material(
+    tc = mat.Material(
         _area = 4.0 * np.pi * (r * r), # m2
         _vol = (4.0 / 3.0) * np.pi * (r * r * r), # m3
         _hc = 210, # W/m2-K
@@ -44,19 +36,46 @@ def test_material():
         _rho = 8500, # kg/m3
         _cp = 230 # J/kg-K
     )
+    return tc
 
 
-    # Calculate time to reach 99% of initial temp diff
-    #
-    # dT[t] = dT[0] exp[-beta t], dT[t] = Te - T[t]
-    # dT[t] / dT[0] = 0.99      , since dT[0] is initial temp diff
-    # log(0.99) = log(exp[-beta t]) = -beta t
-    # t = -log(0.99) / beta
+def test_thermocouple():
+    """Solve q 4-1 from Cengel and Ghajar, pg.242.
+
+    Given immersion of there in gas stream with temp Te, calculate time of
+    thermocouple to reach 99% of initial temp diff.
+
+    The time (t) equals:
+        t = -log(0.99) / beta
+
+    Derivation:
+        dT[t] = dT[0] exp[-beta t], dT[t] = Te - T[t]
+        dT[t] / dT[0] = (100%-99%) / 100%, since dT[0] is initial temp diff
+        log(0.01) = log(exp[-beta t]) = -beta t
+        t = -log(0.99) / beta
+    """
+    # Should check if Bi <= 0.1 to see if lumped node assumption valid.
+
+    # Calculate beta (time constant) pVC / hA
+    tc = _thermocouple()
+    beta = mat.time_constant(
+        tc.area, tc.vol, tc.hc, tc.rho, tc.cp)
+
+    t = -np.log(0.01) / beta
+    t_ = 10.0 # s
+    print(t)
+    assert np.abs(t - t_) < 1e-5
 
 
-    char_len = sph.vol / sph.area
+def test_material():
+    """Test material class."""
 
-
+    # Test tolerance error
+    mat_ = mat.Material(1, 1, 1, 1, 1, 1)
+    with pytest.raises(AssertionError):
+        mat_.area = 0.0
+    with pytest.raises(AssertionError):
+        mat_.hc = 1e-11
 
 
 def test_diffusivity():

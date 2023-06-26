@@ -13,10 +13,7 @@ class Material:
         alpha-t / L2        Fo (Fourier number) [-]
 
     Given dT[t] = T[t] - Te, we can express a lumped node dT[t] as:
-
         dT[t]/dT[0] = exp[Bi Fo(t)] = exp[t/beta]
-    Biot number represents ratio of convection at surface to
-    conduction within body
 
     Args:
         area: float  # [m2] surface area
@@ -137,11 +134,7 @@ def time_constant(rho, vol, cp, hc, area):
     Args:
         area: float  # [m2] surface area
         vol: float   # [m3] volume
-
-        # Surface heat transfer params
         hc: float    # [W/m2-K] convective coefficient
-
-        # Body heat transfer params
         rho: float   # [kg/m3] density
         cp: float    # [J/kg-K] specific heat capacity at constant pressure
 
@@ -176,6 +169,16 @@ def fourier_coef(alpha:float, char_len:float, dt:float) -> float:
 def biot_coef(h_c:float, char_len:float, k:float) -> float:
     """Dimensionless Biot coefficient (h-Lc / k) [-].
 
+    Biot number represents ratio of convection at surface to
+    conduction within body:
+        hc / U
+
+    In a lumped node system, the body must have a uniform distribution of
+    temperature, which occurs when conductance is very high relative to
+    convection. Thus a lumped node system is typically considered valid
+    the Bi <= 0.1.
+
+
     Units h_c-Lc / k
         = m-(W/m2-K) / (W/m-K)
         = W/m-K / W/m-K
@@ -193,8 +196,6 @@ def biot_coef(h_c:float, char_len:float, k:float) -> float:
     assert k >= 1e-10  # must have Conductivity
 
     return (h_c * char_len) / k
-
-
 
 
 def tau(delta_time, t):
