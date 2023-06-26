@@ -6,13 +6,6 @@ import material as mat
 import heat as heat
 
 
-# TODO
-# obj: get infrastructure for optimization working w/ lumped node
-# - test: mesh-grid A,V, [k, cp, hc]
-# - plot Bi={0.001 - 0.1} (colored)
-# - plot Te at 1 hour intervals, and update T (1 slice)
-# - plot Te-T average (colored - on top of Bi)
-
 def _thermocouple():
     """Test material from Cengel and Ghajar, pg.242.
 

@@ -30,98 +30,32 @@ class Material:
         cp: float    # [J/kg-K] specific heat capacity at constant pressure
 
     """
-    # Constants
-    _EPS = 1e-10  # [-] zero tolerance epsilon
-
-    # Geometry
-    _area: float
-    _vol: float   # [m3] volume
-
     # Surface heat transfer params
-    _hc: float    # [W/m2-K] convective coefficient
+    hc: ndfloat
+    area: ndfloat
 
     # Body heat transfer params
-    _k: float     # [W/m-K] thermal conductivity
-    _rho: float   # [kg/m3] density
-    _cp: float    # [J/kg-K] specific heat capacity
-                 # at constant pressure
-
-    @property
-    def area(self):
-        """Surface area in [m2]"""
-        return self._area
-
-    @area.setter
-    def area(self, area):
-        assert area >= self._EPS, f"Area must be positive, got {area}."
-        self._area = float(area)
-
-    @property
-    def vol(self):
-        """Volume in [m3]"""
-        return self._vol
-
-    @vol.setter
-    def vol(self, vol):
-        assert vol >= self._EPS, f"Volume must be positive, got {vol}."
-        self._vol = float(vol)
-
-    @property
-    def hc(self):
-        """Surface convective coefficient in [W/m2-K]"""
-        return self._hc
-
-    @hc.setter
-    def hc(self, hc):
-        assert hc >= self._EPS, "Convectivity can't be adiabatic, got hc {hc}."
-        self._hc = float(hc)
-
-    @property
-    def k(self):
-        """Body conductive coefficient in [W/m-K]"""
-        return self._k
-
-    @k.setter
-    def k(self, k):
-        assert k >= self._EPS, f"Conductivity can't be adiabatic, got {k}."
-        self._k = float(k)
-
-    @property
-    def rho(self):
-        """Density in [kg/m3]."""
-        return self._rho
-
-    @rho.setter
-    def rho(self, rho):
-        assert rho >= self._EPS, f"Density must be positive, got {rho}."
-        self._rho = float(rho)
-
-    @property
-    def cp(self):
-        """Specific heat capacity at constant pressure in [J/kg-K]"""
-        return self._cp
-
-    @cp.setter
-    def cp(self, cp):
-        assert cp >= self._EPS, "Heat capacity must be positive, got {cp}."
-        self._cp = float(cp)
+    vol: ndfloat
+    k: ndfloat
+    rho: ndfloat
+    cp: ndfloat
 
 
-def diffusivity_coef(k:float, rho:float, C_p:float) -> float:
-    """Diffusivity coefficient alpha = k / rho-C [m2/s].
+def diffusivity_coef(k:ndfloat, rho:ndfloat, c_p:ndfloat) -> ndfloat:
+    """diffusivity coefficient alpha = k / rho-c [m2/s].
 
-    Units k / rho-C
-        = W/m-K / kg/m3-J/kg-K
+    units k / rho-c
+        = w/m-k / kg/m3-j/kg-k
         = m2/s
 
-    Args:
-        k: conductivity [W/m-K]
+    args:
+        k: conductivity [w/m-k]
         rho: density [kg/m3]
-        C_p: specific heat capacity at constant pressure [J/kg-K]
+        c_p: specific heat capacity at constant pressure [j/kg-k]
 
-    Returns diffusivity coefficient [m2/s].
+    returns diffusivity coefficient [m2/s].
     """
-    return k / (rho * C_p)
+    return k / (rho * c_p)
 
 
 def time_constant(rho, vol, cp, hc, area):
@@ -168,7 +102,7 @@ def fourier_num(alpha:ndfloat, char_len:ndfloat, nt:ndfloat) -> ndfloat:
     return (alpha * nt) / (char_len * char_len)
 
 
-def biot_num(h_c:float, char_len:float, k:float) -> float:
+def biot_num(h_c:ndfloat, char_len:ndfloat, k:ndfloat) -> ndfloat:
     """Dimensionless Biot number (h-Lc / k) [-].
 
     Biot number represents ratio of convection at surface to
@@ -200,7 +134,7 @@ def biot_num(h_c:float, char_len:float, k:float) -> float:
     return (h_c * char_len) / k
 
 
-def tau(delta_time, t):
+def tau(delta_time:ndfloat, t:ndfloat)->ndfloat:
     """Time scale tau, dimensionless time from Holford."""
     return t / delta_time
 
