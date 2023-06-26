@@ -33,12 +33,12 @@ def test_material():
 
     r = 0.0005 # m
     sph = mat.Material(
-        area = 4.0 * np.pi * (r * r), # m2
-        vol = (4.0 / 3.0) * np.pi * (r * r * r), # m3
-        hc = 210, # W/m2-K
-        k = 35, # W/m-K
-        rho = 8500, # kg/m3
-        cp = 230 # J/kg-K
+        _area = 4.0 * np.pi * (r * r), # m2
+        _vol = (4.0 / 3.0) * np.pi * (r * r * r), # m3
+        _hc = 210, # W/m2-K
+        _k = 35, # W/m-K
+        _rho = 8500, # kg/m3
+        _cp = 230 # J/kg-K
     )
 
     # Calculate time to reach 99% of initial temp diff
