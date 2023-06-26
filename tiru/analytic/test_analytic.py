@@ -16,11 +16,10 @@ import heat as heat
 # - bd plot / vim.sh
 def test_material():
     """Test material class."""
+    mat.Material()
 
     # Test tolerance error
     sph = mat.Material(1, 1, 1, 1, 1, 1)
-    sph.area = 1.0
-    sph.area = 0
     with pytest.raises(AssertionError):
         sph.area = 0.0
 

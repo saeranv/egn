@@ -4,30 +4,28 @@ from dataclasses import dataclass
 
 @dataclass
 class Material:
-    """Attributes for material properties.
+    """Attributes for material properties A, hc, k, V, p, Cp.
+
+    These combine to form:
+        pVC / hA            beta (time constant) [s]
+        k / pC              alpha (diffusivity) [m2/s]
+        h-Lc / k = h / U    Bi (Biot number) [-]
+        alpha-t / L2        Fo (Fourier number) [-]
+
+    Given dT[t] = T[t] - Te, we can express a lumped node dT[t] as:
+
+        dT[t]/dT[0] = exp[Bi Fo(t)] = exp[t/beta]
+    Biot number represents ratio of convection at surface to
+    conduction within body
 
     Args:
         area: float  # [m2] surface area
         vol: float   # [m3] volume
-
-        # Surface heat transfer params
         hc: float    # [W/m2-K] convective coefficient
-
-        # Body heat transfer params
         k: float     # [W/m-K] thermal conductivity
         rho: float   # [kg/m3] density
         cp: float    # [J/kg-K] specific heat capacity at constant pressure
 
-    These combine to form:
-        pVC / hA            [s] beta (time constant)
-        k / pC              [m2/s] alpha (diffusivity)
-        h-Lc / k = h / U    [-] Bi (Biot number)
-        alpha-t / L2        [-] Fo (fourier number)
-
-    (T[t] - Te) = (T[0] - Te) exp[Bi Fo(t)] = beta t
-
-    Biot number represents ratio of convection at surface to
-    conduction within body
     """
     # Constants
     _EPS = 1e-10  # [-] zero tolerance epsilon
@@ -47,19 +45,63 @@ class Material:
 
     @property
     def area(self):
-        """[m2] surface area"""
+        """Surface area in [m2]"""
         return self._area
 
     @area.setter
-    def area(self, v):
-        assert v >= self._EPS
-        self._area = v
+    def area(self, area):
+        assert area >= self._EPS, f"Area must be positive, got {area}."
+        self._area = area
 
+    @property
+    def vol(self):
+        """Volume in [m3]"""
+        return self._vol
 
+    @vol.setter
+    def vol(self, vol):
+        assert vol >= self._EPS, f"Volume must be positive, got {vol}."
+        self._vol = vol
 
-    # assert k >= 1e-10    # not adiabatic
-    # assert rho >= 1e-10  # must have density
-    # assert C_p >= 1e-10  # must have heat capacity
+    @property
+    def hc(self):
+        """Surface convective coefficient in [W/m2-K]"""
+        return self._hc
+
+    @hc.setter
+    def hc(self, hc):
+        assert hc >= self._EPS, "Convectivity can't be adiabatic, got hc {hc}."
+        self._hc = hc
+
+    @property
+    def k(self):
+        """Body conductive coefficient in [W/m-K]"""
+        return self._k
+
+    @k.setter
+    def k(self, k):
+        assert k >= self._EPS, f"Conductivity can't be adiabatic, got {k}."
+        self._k = k
+
+    @property
+    def rho(self):
+        """Density in [kg/m3]."""
+        return self._rho
+
+    @rho.setter
+    def rho(self, rho):
+        assert rho >= self._EPS, f"Density must be positive, got {rho}."
+        self._rho = rho
+
+    @property
+    def cp(self):
+        """Specific heat capacity at constant pressure in [J/kg-K]"""
+        return self._cp
+
+    @cp.setter
+    def cp(self, cp):
+        assert cp >= self._EPS, "Heat capacity must be positive, got {cp}."
+        self._cp = cp
 
 
 def diffusivity_coef(k:float, rho:float, C_p:float) -> float:

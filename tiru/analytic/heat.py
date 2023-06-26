@@ -4,10 +4,24 @@ import numpy as np
 import material as mat
 
 
-def ref():
-    """Usage and reference.
+def lumped_node(bi:float, fo:float):
+    """Dimensionless transient lumped node eqn.
 
-    ## USAGE:
+    Solves for theta given Bi and tau,
+        theta(tau) = exp(Bi tau)
+
+    Args:
+        Bi: Biot number = h-Lc / k [-]
+        tau: dimensionless time = a t / Lc2 [-]
+
+    Returns dimensionless temp, theta = (T - T_ext) / (T0 - T_ext) [-]
+    """
+    # T =  (theta * (T0 - T_ext)) + T_ext)
+    return np.exp(bi * fo)
+
+
+def use():
+    """## USAGE:
     ```python
     # Define dimensionless params
     char_len = vol / area  # [m]
@@ -25,6 +39,12 @@ def ref():
 
     temps = theta * delta_T
     ```
+    """
+    return use.__doc__
+
+
+def ref():
+    """Usage and reference.
 
     ## LUMPED NODE ASSUMPTIONS
     Assumes node is spatially isothermal (Bi < 0.1), and ambient temperature
@@ -104,21 +124,5 @@ def ref():
     .. math::
         theta(t) = exp(Bi Fo) = exp(hA/VpC t)
     """
-    pass
-
-
-def lumped_node(bi:float, fo:float):
-    """Dimensionless transient lumped node eqn.
-
-    Solves for theta given Bi and tau,
-        theta(tau) = exp(Bi tau)
-
-    Args:
-        Bi: Biot number = h-Lc / k [-]
-        tau: dimensionless time = a t / Lc2 [-]
-
-    Returns dimensionless temp, theta = (T - T_ext) / (T0 - T_ext) [-]
-    """
-    # T =  (theta * (T0 - T_ext)) + T_ext)
-    return np.exp(bi * fo)
+    return ref.__doc__
 
