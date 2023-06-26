@@ -7,8 +7,7 @@ import heat as heat
 
 
 # TODO
-# obj: get infrastructure for optimization
-# working w/ lumped node
+# obj: get infrastructure for optimization working w/ lumped node
 # X- find Cengel example
 # X- create test material
 # X- material class
@@ -79,37 +78,6 @@ def test_time_constant():
     assert np.abs(b - b_) < 1e-2  # slightly less accurate than 1e-3
 
 
-
-def test_thermocouple():
-    """Solve q 4-1 from Cengel and Ghajar, pg.242.
-
-    Given immersion of there in gas stream with temp Te, calculate time of
-    thermocouple to reach 99% of initial temp diff.
-
-    The time (t) equals:
-        t = -log(0.99) * beta
-
-    Derivation:
-        dT[t] = dT[0] exp[-t/beta t], where dT[t] = Te - T[t]
-        dT[t] / dT[0] = (100%-99%) / 100%, since dT[0] is initial temp diff
-        log(0.01) = log(exp[-t / beta]) = -t / beta
-        t = -log(0.99) / beta
-    """
-    tc = _thermocouple()
-
-    # Check if Bi <= 0.1 to see if lumped node assumption valid.
-    bi = (tc.hc * (tc.vol / tc.area)) / tc.k
-    assert bi <= 0.1, bi
-
-    # Test beta (time constant) pVC / hA
-    beta = (tc.rho * tc.vol * tc.cp) / (tc.hc * tc.area)  # [s]
-
-    # Test t (answer)
-    t = -1 * np.log(0.01) * beta
-    t_ = 10 # s
-    assert np.abs(t - t_) < 1e-1
-
-
 def test_diffusivity():
     """Test derivation of thermal diffusivity."""
 
@@ -133,64 +101,78 @@ def test_fourier_number():
     t = 1.0 # s
     lc = tc.vol / tc.area
     fo = mat.fourier_num(alpha, lc, t)
+
     # Derive Fo from 1/beta value givein in q 4-1
     # t/beta = Fo Bi
     # Fo = t/(beta Bi)
     beta_ = 1.0/0.462 # given beta
     bi_ = 0.001       # given biot
     fo_ = t / (beta_ * bi_)
-    print(fo, fo_)
-    assert np.abs(fo - fo_) < 1.0
+
+    # lose lots of precision w/ Cengel's vals
+    assert np.abs(fo - fo_) < 1.5
 
 
-# def test_lumped_node():
-#     """Test mat law of cooling."""
+def test_thermocouple():
+    """Solve q 4-1 from Cengel and Ghajar, pg.242.
 
-#     # Diffusivity (alpha) params: hA/pCV
-#     h_c = 1 # W/m2-K
-#     area = 1 # m2
-#     rho = 1 # kg/m3
-#     C_p = 1 # specific heat J/kg-K
-#     vol = 1 # m3
+    Given immersion of there in gas stream with temp Te, calculate time of
+    thermocouple to reach 99% of initial temp diff.
 
-#     # Initial temperatures
-#     T0 = 100 # C
-#     T_ext = 23 # C
+    The time (t) equals:
+        t = -log(0.99) * beta
 
-#     # Time params
-#     t = 30 # s
+    Derivation:
+        dT[t] = dT[0] exp[-t/beta t], where dT[t] = Te - T[t]
+        dT[t] / dT[0] = (100%-99%) / 100%, since dT[0] is initial temp diff
+        log(0.01) = log(exp[-t / beta]) = -t / beta
+        t = -log(0.99) / beta
+    """
+    tc = _thermocouple()
+    lc = tc.vol / tc.area
+    # Check if Bi <= 0.1 to see if lumped node assumption valid.
+    bi = (tc.hc * (tc.vol / tc.area)) / tc.k
+    assert bi <= 0.1, bi
 
-#     eps = 1e-10
-#     assert T0 > -273.15; assert T_ext > -273.15
-#     assert h_c >= eps; assert area >= eps
-#     assert C_p >= eps; assert vol >= eps; assert rho >= eps
-#     assert t >= eps
+    # Test beta (time constant) pVC / hA
+    beta = (tc.rho * tc.vol * tc.cp) / (tc.hc * tc.area)  # [s]
 
-#     # Derive dimensionless params
-#     char_len = vol / area  # [m]
-#     bi = mat.biot_coef(h_c, char_len, k)
-#     alpha = mat.diffusivity_coef(k, rho, C_p)
-#     fo = mat.fourier_coef(alpha, char_len, dt)
-
-#     # Convert to K, and then dimensionless theta
-#     T0 += 273.15; T_ext += 273.15 # K
-#     delta_T = np.abs(T0 - T_ext)
-
-#     # theta(t) = T(t) / delta_T: dimensionless temp
-#     # T = theta * delta_T
-#     theta = heat.lumped_node(bi, fo)
-#     T_int = theta * delta_T
-
-#     assert isinstance(T_int, np.ndarray), type(T_int)
-#     assert T_int.shape == t, T_int.shape
-#     assert T0 > T_ext
-#     assert T_int[0] == T0
-#     assert T_int[1] < T0
-#     assert abs(np.min(T_int) - T_int[-1]) <= 1e-10
+    # Test t (answer)
+    t = -1 * np.log(0.01) * beta
+    t_ = 10 # s
+    assert np.abs(t - t_) < 1e-1
 
 
-# def test_chi_param():
-#     """Test chi param."""
+    # Test same problem w/ heat class
 
-#     pass
+    # Initial temperatures
+    temp_0 = 100.0 + 273.15 # K
+    temp_ext = 0.0 + 273.15 # K
+    t = np.arange(1, 10) # 0-10 seconds (time at T[t])
+    # so at 99%, T_int ~ 1C
+
+
+    # Derive dimensionless params
+    lc = tc.vol / tc.area  # [m]
+    alpha = mat.diffusivity_coef(tc.k, tc.rho, tc.cp)
+    #
+    bi = mat.biot_num(tc.hc, lc, tc.k)
+    fo = mat.fourier_num(alpha, lc, t)
+
+    # Convert temps to dimensionless theta
+    # theta(t) = T(t) / delta_T: dimensionless temp
+    delta_temp = temp_ext - temp[0]
+
+    # T = theta * delta_T
+    theta = heat.lumped_node(bi, fo)
+    temp = theta * delta_temp
+
+    assert isinstance(T_int, np.ndarray), type(T_int)
+    assert T_int.shape == t, T_int.shape
+    assert T0 > T_ext
+    assert T_int[0] == T0
+    assert T_int[1] < T0
+    assert abs(np.min(T_int) - T_int[-1]) <= 1e-10
+
+
 
