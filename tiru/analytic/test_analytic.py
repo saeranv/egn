@@ -1,0 +1,165 @@
+# Unit test for analytical models
+
+import pytest
+import numpy as np
+import material as mat
+import heat as heat
+
+
+def _thermocouple():
+    """Test material from Cengel and Ghajar, pg.242.
+
+    Represents thermocouple (temp sensor) junction as 0.5 mm radius there.
+
+    Given:
+        radius = 0.0005 # m
+        k = 35 # W/m-K
+        rho = 8500 # kg/m3
+        cp = 230 # J/kg-K
+        hc = 210 # W/m2-K
+    """
+    r = 0.0005 # m
+    tc = mat.Material(
+        area = 4.0 * np.pi * (r * r), # m2
+        vol = (4.0 / 3.0) * np.pi * (r * r * r), # m3
+        hc = 210, # W/m2-K
+        k = 35, # W/m-K
+        rho = 8500, # kg/m3
+        cp = 320 # J/kg-K
+    )
+    return tc
+
+
+def test_material():
+    """Test material class."""
+
+    # Test errors for bad inputs
+    tc = _thermocouple()
+
+    # Confirm vol, area of sphere is correct
+    lc = tc.vol / tc.area
+    lc_ = 1.67 * 1e-4 # m
+    assert np.abs(lc - lc_) < 1e-4
+
+
+def test_biot_num():
+    """Test derivation of biot coefficient."""
+
+    tc = _thermocouple()
+    lc = tc.vol / tc.area
+    biot_ = mat.biot_num(tc.hc, lc, tc.k)
+    biot = 0.001  # Bi = (h_c * L^2) / k
+
+    assert np.abs(biot - biot_) < 1e-3
+
+
+def test_time_constant():
+    """Test time constant."""
+
+    # Test beta (time constant) pVC / hA
+    # vol/area, (hc V)/(kA) already tested, so this tests rho-Cp
+    tc = _thermocouple()
+    lc = tc.vol / tc.area
+    # Test reciprocal b = 1/beta
+    b = tc.hc / (tc.rho * lc * tc.cp)   # [1/s]
+    b_ = 0.462      # 1/s
+    assert np.abs(b - b_) < 1e-2  # slightly less accurate than 1e-3
+
+
+def test_diffusivity():
+    """Test derivation of thermal diffusivity."""
+
+    tc = _thermocouple()
+    # alpha: k / p C
+    alpha = mat.diffusivity_coef(tc.k, tc.cp, tc.rho)
+
+    # Derive alpha from b_, Lc given in q 4-1
+    b_ = 0.462 # hA/pVC
+    lc_ = 1.67 * 1e-4 # ma
+    alpha_ = (b_ * lc_ * tc.k) / tc.hc
+
+    assert np.abs(alpha - alpha_) < 1e-3
+
+
+def test_fourier_number():
+    """Test Fourier number."""
+
+    tc = _thermocouple()
+    alpha = mat.diffusivity_coef(tc.k, tc.cp, tc.rho)
+    t = 1.0 # s
+    lc = tc.vol / tc.area
+    fo = mat.fourier_num(alpha, lc, t)
+
+    # Derive Fo from 1/beta value givein in q 4-1
+    # t/beta = Fo Bi
+    # Fo = t/(beta Bi)
+    beta_ = 1.0/0.462 # given beta
+    bi_ = 0.001       # given biot
+    fo_ = t / (beta_ * bi_)
+
+    # lose lots of precision w/ Cengel's vals
+    assert np.abs(fo - fo_) < 1.5
+
+
+def test_thermocouple():
+    """Solve q 4-1 from Cengel and Ghajar, pg.242.
+
+    Given immersion of there in gas stream with temp Te, calculate time of
+    thermocouple to reach 99% of initial temp diff.
+
+    The time (t) equals:
+        t = -log(0.99) * beta
+
+    Derivation:
+        dT[t] = dT[0] exp[-t/beta t], where dT[t] = Te - T[t]
+        dT[t] / dT[0] = (100%-99%) / 100%, since dT[0] is initial temp diff
+        log(0.01) = log(exp[-t / beta]) = -t / beta
+        t = -log(0.99) / beta
+    """
+    tc = _thermocouple()
+    lc = tc.vol / tc.area
+
+    # Test time to get to 1C manually
+    # Check if Bi <= 0.1 to see if lumped node assumption valid.
+    bi = (tc.hc * (tc.vol / tc.area)) / tc.k
+    assert bi <= 0.1, bi
+    # Test beta (time constant) pVC / hA
+    beta = (tc.rho * tc.vol * tc.cp) / (tc.hc * tc.area)  # [s]
+
+    # Test t (answer)
+    t = -1 * np.log(0.01) * beta
+    t_ = 10 # s
+    assert np.abs(t - t_) < 1e-1
+
+
+    # Test same problem w/ heat class
+    # Initial temperatures
+    temp_0 = 100.0
+    temp_ext = 0.0
+    # temp_0 = _temp_0 + 273.15 # K
+    # temp_ext = _temp_ext + 273.15 # K
+    t = np.arange(0, 11) # 0-10 seconds in 11 steps (time at T[t])
+    alpha = mat.diffusivity_coef(tc.k, tc.rho, tc.cp)
+    fo = mat.fourier_num(alpha, lc, t)
+    # so at 99%, T_int ~ 1C
+
+    # Get theta, imensionless temp
+    tc.theta = heat.lumped_node(bi, fo)
+    assert tc.theta.shape == t.shape
+    assert np.abs(tc.theta[0] - 1.0) < 1e-10
+    assert np.abs(tc.theta[-1] - 0.0) < 1e-2
+
+    # theta(fo) = (T[t]-Te) / (T[0]-Te)
+    # theta * (T[0]-Te) = T[t] - Te
+    # T[t] = [theta * (T[0]-Te)] + Te
+    dT = (temp_0 - temp_ext)
+    tc.temp = (tc.theta * dT) + temp_ext
+    # print(tc.theta.round(2))
+    # print(temp.round(2))
+    assert abs(tc.temp[0] -  temp_0) < 1e-3
+    # after 10s = 99% of temp diff achieved = T[10]=1C
+    assert abs(tc.temp[10] - 1.0) < 1e-1
+
+
+
+

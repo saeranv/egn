@@ -1,0 +1,4 @@
+openstudio==3.5.0
+numpy
+pandas
+geopandas @ file:///home/conda/feedstock_root/build_artifacts/geopandas_1594925563431/work
