@@ -1,0 +1,13 @@
+[Unit]
+Description=Egn Server
+
+[Service]
+ExecStart=/home/saeranv/miniconda3/envs/ml/bin/python /mnt/c/users/admin/master/egn/egn/server/app.py
+Restart=always
+User=saeranv
+Group=saeranv
+Environment="PATH=/usr/bin:/home/saeranv/miniconda3/envs/ml"
+WorkingDirectory=/mnt/c/users/admin/master/egn/egn/server/
+
+[Install]
+WantedBy=multi-user.target

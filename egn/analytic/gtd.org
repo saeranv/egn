@@ -1,0 +1,48 @@
+## SCRATCH
+## --------- 
+- initial goal for recharge:
+    - write sim 
+    - viz/graph production 
+    - make ppt
+    - compare to OSM 
+    X- derive the rest of the paper
+## ---------
+
+## GTD-META 
+## obj: rescope for recharge
+X- gtd-meta
+X- absorb/modify others
+X- gtd-recharge
+- shower 
+- gym 
+
+## GTD-RECHARGE-SIM
+## obj: sim/viz existing natvent code
+- re-familirize w/ paper
+- fix tests
+- write test for simulation of lumped node   
+- write simulation code
+- start jukit - graph result
+
+## GTD-RECHARGE-PPT
+## obj: make ppt of code
+- cp ppt of energy research 
+- make changes
+
+## GTD-RECHARGE-OSM
+## obj: get OSM and test case
+- get osm file for testing
+    - use upenn office
+        - setup: toggle natvent
+        - remove HVAC/setpoints
+    X- use ppml to make a HB box
+    X- use finitebem osm
+- extract material info
+- extract ext temp info (?)
+- extract geometry info (manually) 
+- run the sim w/ inv(?)
+- graph the results
+
+
+## DONE
+## --------- 
